@@ -1,51 +1,10 @@
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
+import { getSiteContentMap, t } from '@/lib/data/content';
+import type { Locale } from '@/lib/types';
 
-const ATELIER_CONTENT = {
-  sq: {
-    eyebrow: 'Atelier · Porosi me Dizajn',
-    title: (
-      <>
-        Kur asgjë <em className="font-serif italic font-light text-gold-dark">e gatshme</em>
-        <br />
-        nuk mjafton.
-      </>
-    ),
-    intro: 'Disa momente meritojnë diçka që nuk ekziston ende. Le ta krijojmë bashkë.',
-    tagNum: '04',
-    tagLabel: 'Hapa drejt unikalitetit',
-    cta: 'Nis Projektin Tënd',
-    steps: [
-      { num: '01', title: 'Konsultim', desc: 'Bisedojmë për idenë, momentin, personin që do ta mbajë.' },
-      { num: '02', title: 'Skicë & Model 3D', desc: 'Krijojmë vizualizimin e parë. Ndryshime pa kufi derisa të jetë i përsosur.' },
-      { num: '03', title: 'Realizim me Dorë', desc: 'Artizanët tanë e marrin nga ekrani në realitet, me kujdes maksimal.' },
-      { num: '04', title: 'Dorëzim', desc: 'Në kuti elegancë, me certifikatë autenticiteti dhe garanci të zgjeruar.' },
-    ],
-  },
-  en: {
-    eyebrow: 'Atelier · Custom Design',
-    title: (
-      <>
-        When nothing <em className="font-serif italic font-light text-gold-dark">ready-made</em>
-        <br />
-        is enough.
-      </>
-    ),
-    intro: 'Some moments deserve something that doesn\'t exist yet. Let\'s create it together.',
-    tagNum: '04',
-    tagLabel: 'Steps to uniqueness',
-    cta: 'Start Your Project',
-    steps: [
-      { num: '01', title: 'Consultation', desc: 'We talk about the idea, the moment, the person who will wear it.' },
-      { num: '02', title: 'Sketch & 3D Model', desc: 'We create the first visualization. Endless changes until it\'s perfect.' },
-      { num: '03', title: 'Handcrafting', desc: 'Our artisans take it from screen to reality with maximum care.' },
-      { num: '04', title: 'Delivery', desc: 'In an elegant box, with authenticity certificate and extended warranty.' },
-    ],
-  },
-};
-
-export function Atelier({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
-  const t = ATELIER_CONTENT[locale];
+export async function Atelier({ locale = 'sq' }: { locale?: Locale }) {
+  const c = await getSiteContentMap(locale);
 
   return (
     <section
@@ -81,34 +40,49 @@ export function Atelier({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
             </svg>
 
             <div className="absolute bottom-10 left-10 z-[2]">
-              <div className="font-display text-[56px] text-gold-light leading-none">{t.tagNum}</div>
-              <div className="text-[11px] tracking-widest uppercase text-pearl mt-2">{t.tagLabel}</div>
+              <div className="font-display text-[56px] text-gold-light leading-none">
+                {t(c, 'atelier.tag_num', '04')}
+              </div>
+              <div className="text-[11px] tracking-widest uppercase text-pearl mt-2">
+                {t(c, 'atelier.tag_label')}
+              </div>
             </div>
           </div>
 
           <div className="reveal">
-            <div className="eyebrow mb-6">{t.eyebrow}</div>
-            <h2 className="font-display text-display-md text-ink-black mb-8">{t.title}</h2>
-            <p className="font-serif italic text-xl leading-[1.6] text-ink mb-12">{t.intro}</p>
+            <div className="eyebrow mb-6">{t(c, 'atelier.eyebrow')}</div>
+            <h2 className="font-display text-display-md text-ink-black mb-8">
+              {t(c, 'atelier.title_line1')}{' '}
+              <em className="font-serif italic font-light text-gold-dark">
+                {t(c, 'atelier.title_accent')}
+              </em>
+              <br />
+              {t(c, 'atelier.title_line2')}
+            </h2>
+            <p className="font-serif italic text-xl leading-[1.6] text-ink mb-12">
+              {t(c, 'atelier.intro')}
+            </p>
 
             <div className="my-12">
-              {t.steps.map((step) => (
-                <div key={step.num} className="flex gap-6 py-6 border-b border-line">
+              {[1, 2, 3, 4].map((n) => (
+                <div key={n} className="flex gap-6 py-6 border-b border-line">
                   <div className="font-display text-[32px] text-gold-dark leading-none min-w-[60px]">
-                    {step.num}
+                    0{n}
                   </div>
                   <div>
                     <strong className="block font-display text-xl text-ink-black mb-1.5 font-normal">
-                      {step.title}
+                      {t(c, `atelier.step${n}_title`)}
                     </strong>
-                    <span className="font-serif text-base italic text-ink">{step.desc}</span>
+                    <span className="font-serif text-base italic text-ink">
+                      {t(c, `atelier.step${n}_desc`)}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <Button href="#contact" variant="primary">
-              {t.cta}
+            <Button href="/atelier" variant="primary">
+              {t(c, 'atelier.cta')}
             </Button>
           </div>
         </div>

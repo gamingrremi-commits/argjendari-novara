@@ -1,25 +1,11 @@
-const MARQUEE_ITEMS = {
-  sq: [
-    'UNAZA FEJESE',
-    'DIZAJN PERSONAL',
-    'ARI 18K',
-    'DIAMANTE TË CERTIFIKUAR',
-    'RIPARIME EKSPERTE',
-    'PORTOFOL UNIK',
-  ],
-  en: [
-    'ENGAGEMENT RINGS',
-    'CUSTOM DESIGN',
-    '18K GOLD',
-    'CERTIFIED DIAMONDS',
-    'EXPERT REPAIRS',
-    'UNIQUE PIECES',
-  ],
-};
+import { getSiteContentMap, tList } from '@/lib/data/content';
+import type { Locale } from '@/lib/types';
 
-export function Marquee({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
-  const items = MARQUEE_ITEMS[locale];
-  // Duplicate for seamless loop
+export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
+  const c = await getSiteContentMap(locale);
+  const items = tList(c, 'marquee.items', [
+    'UNAZA FEJESE', 'DIZAJN PERSONAL', 'ARI 18K', 'DIAMANTE TË CERTIFIKUAR', 'RIPARIME EKSPERTE', 'PORTOFOL UNIK',
+  ]);
   const doubled = [...items, ...items];
 
   return (

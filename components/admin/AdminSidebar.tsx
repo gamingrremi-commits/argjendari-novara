@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: '◐' },
   { href: '/admin/produkte', label: 'Produkte', icon: '◇' },
   { href: '/admin/kategorite', label: 'Kategoritë', icon: '⊞' },
+  { href: '/admin/permbajtja', label: 'Përmbajtja', icon: '✎' },
   { href: '/admin/mesazhet', label: 'Mesazhet', icon: '✉' },
 ];
 

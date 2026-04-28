@@ -1,52 +1,35 @@
 import { Container } from '@/components/ui/Container';
 import { SITE_CONFIG } from '@/lib/config';
+import { getSiteContentMap, t } from '@/lib/data/content';
 import type { Locale } from '@/lib/types';
 
-const LOCATION_CONTENT = {
-  sq: {
-    eyebrow: 'Vizitoni',
-    title: (
-      <>
-        Në zemër të{' '}
-        <em className="font-serif italic font-light text-gold-dark">Durrësit</em>.
-      </>
-    ),
-    addressLabel: 'Adresa',
-    hoursLabel: 'Orari',
-    contactLabel: 'Kontakt',
-    mapsCta: 'Hap në Google Maps',
-  },
-  en: {
-    eyebrow: 'Visit',
-    title: (
-      <>
-        In the heart of{' '}
-        <em className="font-serif italic font-light text-gold-dark">Durrës</em>.
-      </>
-    ),
-    addressLabel: 'Address',
-    hoursLabel: 'Hours',
-    contactLabel: 'Contact',
-    mapsCta: 'Open in Google Maps',
-  },
-};
-
-export function Location({ locale = 'sq' }: { locale?: Locale }) {
-  const t = LOCATION_CONTENT[locale];
+export async function Location({ locale = 'sq' }: { locale?: Locale }) {
+  const c = await getSiteContentMap(locale);
   const { coordinates } = SITE_CONFIG.address;
   const hours = SITE_CONFIG.hours[locale];
+
+  const labels = {
+    sq: { addr: 'Adresa', hours: 'Orari', contact: 'Kontakt', cta: 'Hap në Google Maps' },
+    en: { addr: 'Address', hours: 'Hours', contact: 'Contact', cta: 'Open in Google Maps' },
+  }[locale];
 
   return (
     <section id="location" className="py-[140px] px-12 bg-pearl">
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-20 items-center">
           <div className="reveal">
-            <div className="eyebrow mb-6">{t.eyebrow}</div>
-            <h2 className="font-display text-display-sm text-ink-black mb-10">{t.title}</h2>
+            <div className="eyebrow mb-6">{t(c, 'location.eyebrow')}</div>
+            <h2 className="font-display text-display-sm text-ink-black mb-10">
+              {t(c, 'location.title_main')}{' '}
+              <em className="font-serif italic font-light text-gold-dark">
+                {t(c, 'location.title_accent')}
+              </em>
+              .
+            </h2>
 
             <div className="mb-8 pb-8 border-b border-line">
               <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-3 font-medium">
-                {t.addressLabel}
+                {labels.addr}
               </div>
               <div className="font-serif text-[22px] text-ink-black leading-snug">
                 {SITE_CONFIG.address.street}
@@ -64,7 +47,7 @@ export function Location({ locale = 'sq' }: { locale?: Locale }) {
 
             <div className="mb-8 pb-8 border-b border-line">
               <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-3 font-medium">
-                {t.hoursLabel}
+                {labels.hours}
               </div>
               <div className="font-serif text-[22px] text-ink-black leading-snug">
                 {hours.weekdays}
@@ -75,7 +58,7 @@ export function Location({ locale = 'sq' }: { locale?: Locale }) {
 
             <div className="mb-10">
               <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-3 font-medium">
-                {t.contactLabel}
+                {labels.contact}
               </div>
               <div className="font-serif text-[22px] text-ink-black leading-snug">
                 <a
@@ -99,7 +82,7 @@ export function Location({ locale = 'sq' }: { locale?: Locale }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3.5 py-[18px] text-[11px] tracking-widest uppercase font-medium text-ink border-b border-ink hover:text-gold-dark hover:border-gold transition-colors"
             >
-              {t.mapsCta} →
+              {labels.cta} →
             </a>
           </div>
 

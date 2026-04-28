@@ -1,50 +1,9 @@
 import { Container } from '@/components/ui/Container';
+import { getSiteContentMap, t } from '@/lib/data/content';
+import type { Locale } from '@/lib/types';
 
-const PHILOSOPHY_CONTENT = {
-  sq: {
-    eyebrow: 'Filozofia',
-    title: (
-      <>
-        Mjeshtëria <em className="font-serif italic font-light text-gold-light not-italic"><span className="italic">nuk</span></em>
-        <br />
-        nxiton.
-      </>
-    ),
-    paragraphs: [
-      'Çdo pjesë që del nga atelieri ynë mban gjurmën e duarve që e krijuan — me durim, me dashuri për detajin, me respekt për materialin.',
-      'Nuk shesim bizhuteri. Ju ofrojmë momente që do t\'i mbani me vete përgjithmonë.',
-    ],
-    stats: [
-      { num: '2014', label: 'Themeluar në Durrës' },
-      { num: '3,400+', label: 'Klientë të kënaqur' },
-      { num: '18K', label: 'Ari i certifikuar' },
-      { num: '∞', label: 'Garanci e zgjeruar' },
-    ],
-  },
-  en: {
-    eyebrow: 'Philosophy',
-    title: (
-      <>
-        Mastery <em className="font-serif italic font-light text-gold-light not-italic"><span className="italic">does not</span></em>
-        <br />
-        rush.
-      </>
-    ),
-    paragraphs: [
-      'Every piece leaving our atelier carries the trace of the hands that crafted it — with patience, devotion to detail, and respect for the material.',
-      'We don\'t sell jewelry. We offer moments you\'ll carry with you forever.',
-    ],
-    stats: [
-      { num: '2014', label: 'Founded in Durrës' },
-      { num: '3,400+', label: 'Happy clients' },
-      { num: '18K', label: 'Certified gold' },
-      { num: '∞', label: 'Extended warranty' },
-    ],
-  },
-};
-
-export function Philosophy({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
-  const t = PHILOSOPHY_CONTENT[locale];
+export async function Philosophy({ locale = 'sq' }: { locale?: Locale }) {
+  const c = await getSiteContentMap(locale);
 
   return (
     <section className="py-40 px-12 bg-ink-black text-pearl relative overflow-hidden">
@@ -59,23 +18,31 @@ export function Philosophy({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[120px] items-center">
           <div className="reveal">
             <div className="eyebrow mb-6" style={{ color: '#E5C989' }}>
-              {t.eyebrow}
+              {t(c, 'philosophy.eyebrow')}
             </div>
-            <h2 className="font-display text-display-lg mb-10 text-pearl">{t.title}</h2>
-            {t.paragraphs.map((p, i) => (
-              <p key={i} className="font-serif text-[22px] leading-[1.6] text-pearl-warm mb-6 font-light">
-                {p}
-              </p>
-            ))}
+            <h2 className="font-display text-display-lg mb-10 text-pearl">
+              {t(c, 'philosophy.title_line1')}{' '}
+              <em className="font-serif italic font-light text-gold-light not-italic">
+                <span className="italic">{t(c, 'philosophy.title_accent')}</span>
+              </em>
+              <br />
+              {t(c, 'philosophy.title_line2')}
+            </h2>
+            <p className="font-serif text-[22px] leading-[1.6] text-pearl-warm mb-6 font-light">
+              {t(c, 'philosophy.paragraph1')}
+            </p>
+            <p className="font-serif text-[22px] leading-[1.6] text-pearl-warm mb-6 font-light">
+              {t(c, 'philosophy.paragraph2')}
+            </p>
 
             <div className="grid grid-cols-2 gap-12 mt-16 pt-12 border-t border-gold/20">
-              {t.stats.map((stat) => (
-                <div key={stat.label}>
+              {[1, 2, 3, 4].map((n) => (
+                <div key={n}>
                   <div className="font-display text-[64px] text-gold-light leading-none mb-3 font-light">
-                    {stat.num}
+                    {t(c, `philosophy.stat${n}_num`)}
                   </div>
                   <div className="text-[11px] tracking-widest uppercase text-pearl-warm opacity-70">
-                    {stat.label}
+                    {t(c, `philosophy.stat${n}_label`)}
                   </div>
                 </div>
               ))}

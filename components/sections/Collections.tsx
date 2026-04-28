@@ -3,33 +3,9 @@ import Image from 'next/image';
 import { Container } from '@/components/ui/Container';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { getAllCategories } from '@/lib/data/queries';
+import { getSiteContentMap, t } from '@/lib/data/content';
 import { getProductSvgKey } from '@/lib/data/helpers';
 import type { Locale } from '@/lib/types';
-
-const COLLECTIONS_CONTENT = {
-  sq: {
-    eyebrow: 'Koleksionet',
-    title: (
-      <>
-        Çdo pjesë, një <em className="font-serif italic font-light text-gold-dark">histori</em>.
-      </>
-    ),
-    description:
-      'Nga unaza fejese të punuara me kujdes, deri tek aksesorë të rrallë — secila krijim me karakterin e vet.',
-    designs: 'krijime',
-  },
-  en: {
-    eyebrow: 'Collections',
-    title: (
-      <>
-        Every piece, a <em className="font-serif italic font-light text-gold-dark">story</em>.
-      </>
-    ),
-    description:
-      'From carefully crafted engagement rings to rare accessories — each creation with its own character.',
-    designs: 'designs',
-  },
-};
 
 const SVGs: Record<string, JSX.Element> = {
   ring: (
@@ -94,18 +70,30 @@ const SVGs: Record<string, JSX.Element> = {
 };
 
 export async function Collections({ locale = 'sq' }: { locale?: Locale }) {
-  const t = COLLECTIONS_CONTENT[locale];
-  const categories = await getAllCategories();
+  const [categories, c] = await Promise.all([getAllCategories(), getSiteContentMap(locale)]);
 
-  // Build product count map (optional — could query separately later)
+  const title = (
+    <>
+      {t(c, 'collections.title_main')}{' '}
+      <em className="font-serif italic font-light text-gold-dark">
+        {t(c, 'collections.title_accent')}
+      </em>
+      .
+    </>
+  );
+
   return (
     <section id="collections" className="py-[140px] px-12 bg-pearl">
       <Container>
-        <SectionHeader eyebrow={t.eyebrow} title={t.title} description={t.description} />
+        <SectionHeader
+          eyebrow={t(c, 'collections.eyebrow')}
+          title={title}
+          description={t(c, 'collections.description')}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat, i) => {
-            const isFeatured = i === 0; // First category gets featured (2x size) layout
+            const isFeatured = i === 0;
             const num = `N° ${String(i + 1).padStart(2, '0')}`;
             const name = locale === 'sq' ? cat.name_sq : cat.name_en;
             const svgKey = getProductSvgKey(cat.slug);
@@ -133,7 +121,6 @@ export async function Collections({ locale = 'sq' }: { locale?: Locale }) {
                         className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-105"
                         sizes={isFeatured ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 100vw, 25vw'}
                       />
-                      {/* Dark overlay for legibility of overlay text */}
                       <div className="absolute inset-0 bg-gradient-to-t from-ink-black/70 via-ink-black/20 to-ink-black/40 pointer-events-none" />
                     </>
                   ) : (

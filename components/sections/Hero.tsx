@@ -1,28 +1,9 @@
 import { Button } from '@/components/ui/Button';
+import { getSiteContentMap, t } from '@/lib/data/content';
+import type { Locale } from '@/lib/types';
 
-const HERO_CONTENT = {
-  sq: {
-    eyebrow: 'Argjendari Novara · Durrës · Që nga 2014',
-    title: { line1: 'Bukuri që', accent: 'flet', line2: 'pa fjalë.' },
-    sub: 'Bizhuteri të zgjedhura me dorë, krijuar për momente që mbahen mend një jetë të tërë — dhe pak më gjatë.',
-    primaryCta: 'Eksploro Koleksionet',
-    secondaryCta: 'Porosi me dizajn personal',
-    yearsLabel: 'VITE TRADITË',
-    scrollHint: 'Zbulo',
-  },
-  en: {
-    eyebrow: 'Argjendari Novara · Durrës · Since 2014',
-    title: { line1: 'Beauty that', accent: 'speaks', line2: 'without words.' },
-    sub: 'Handpicked jewelry crafted for moments that last a lifetime — and a little longer.',
-    primaryCta: 'Explore Collections',
-    secondaryCta: 'Custom design orders',
-    yearsLabel: 'YEARS OF CRAFT',
-    scrollHint: 'Discover',
-  },
-};
-
-export function Hero({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
-  const t = HERO_CONTENT[locale];
+export async function Hero({ locale = 'sq' }: { locale?: Locale }) {
+  const c = await getSiteContentMap(locale);
 
   return (
     <section
@@ -36,28 +17,28 @@ export function Hero({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
         <div className="relative z-[2]">
           <div className="inline-flex items-center gap-3.5 text-[11px] tracking-widest uppercase text-gold-dark mb-8 font-medium opacity-0 animate-[fadeUp_1s_0.3s_forwards]">
             <span className="w-[42px] h-px bg-gold" />
-            {t.eyebrow}
+            {t(c, 'hero.eyebrow')}
           </div>
 
           <h1 className="font-display text-display-xl text-ink-black mb-8 opacity-0 animate-[fadeUp_1.2s_0.5s_forwards]">
-            {t.title.line1}{' '}
+            {t(c, 'hero.title_line1')}{' '}
             <em className="font-serif italic font-light text-gold-dark not-italic">
-              <span className="italic">{t.title.accent}</span>
+              <span className="italic">{t(c, 'hero.title_accent')}</span>
             </em>
             <br />
-            {t.title.line2}
+            {t(c, 'hero.title_line2')}
           </h1>
 
           <p className="font-serif italic text-[22px] font-light text-ink max-w-[480px] leading-snug mb-12 opacity-0 animate-[fadeUp_1.2s_0.7s_forwards]">
-            {t.sub}
+            {t(c, 'hero.subtitle')}
           </p>
 
           <div className="flex gap-5 items-center flex-wrap opacity-0 animate-[fadeUp_1.2s_0.9s_forwards]">
-            <Button href="#collections" variant="primary">
-              {t.primaryCta}
+            <Button href="/koleksione" variant="primary">
+              {t(c, 'hero.cta_primary')}
             </Button>
-            <Button href="#atelier" variant="secondary">
-              {t.secondaryCta}
+            <Button href="/atelier" variant="secondary">
+              {t(c, 'hero.cta_secondary')}
             </Button>
           </div>
         </div>
@@ -104,15 +85,15 @@ export function Hero({ locale = 'sq' }: { locale?: 'sq' | 'en' }) {
 
           <div className="absolute bottom-8 left-8 text-pearl font-display text-sm tracking-widest">
             <span className="font-serif text-5xl block text-gold-light font-light leading-none mb-2">
-              10+
+              {t(c, 'hero.years_count', '10+')}
             </span>
-            {t.yearsLabel}
+            {t(c, 'hero.years_label')}
           </div>
         </div>
       </div>
 
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[10px] tracking-widest uppercase text-gold-dark flex flex-col items-center gap-3.5 opacity-0 animate-[fadeIn_1s_1.5s_forwards]">
-        {t.scrollHint}
+        {locale === 'sq' ? 'Zbulo' : 'Discover'}
         <span
           className="w-px h-10 animate-scroll-pulse"
           style={{ background: 'linear-gradient(180deg, #C9A961 0%, transparent 100%)' }}
