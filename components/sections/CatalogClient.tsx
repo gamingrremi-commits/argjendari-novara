@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ProductFilters, type SortOption } from '@/components/ui/ProductFilters';
 import type { Product, Category, Locale } from '@/lib/types';
@@ -23,6 +23,7 @@ export function CatalogClient({
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [searchQuery, setSearchQuery] = useState('');
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   // Force ScrollReveal to re-observe newly mounted cards
   useEffect(() => {
@@ -33,7 +34,7 @@ export function CatalogClient({
         el.classList.add('visible');
       }
     });
-  }, [selectedCategory, inStockOnly, featuredOnly, sortBy, searchQuery]);
+  }, [selectedCategory, inStockOnly, featuredOnly, sortBy, deferredSearchQuery]);
 
   const categoryMap = useMemo(() => {
     const m = new Map<string, Category>();
@@ -57,8 +58,8 @@ export function CatalogClient({
       list = list.filter((p) => p.is_featured);
     }
 
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
+    if (deferredSearchQuery.trim()) {
+      const q = deferredSearchQuery.toLowerCase().trim();
       list = list.filter(
         (p) =>
           p.name_sq.toLowerCase().includes(q) ||
@@ -91,7 +92,16 @@ export function CatalogClient({
     }
 
     return list;
-  }, [products, categories, selectedCategory, inStockOnly, featuredOnly, sortBy, searchQuery, locale]);
+  }, [
+    products,
+    categories,
+    selectedCategory,
+    inStockOnly,
+    featuredOnly,
+    sortBy,
+    deferredSearchQuery,
+    locale,
+  ]);
 
   const t = {
     sq: {

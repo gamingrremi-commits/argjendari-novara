@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
 import { getSiteContentMap, t } from '@/lib/data/content';
+import { getLocalizedPath } from '@/lib/routing';
 import type { Locale } from '@/lib/types';
 
 export async function Atelier({ locale = 'sq' }: { locale?: Locale }) {
@@ -81,7 +82,7 @@ export async function Atelier({ locale = 'sq' }: { locale?: Locale }) {
               ))}
             </div>
 
-            <Button href="/atelier" variant="primary">
+            <Button href={getLocalizedPath(locale, 'atelier')} variant="primary">
               {t(c, 'atelier.cta')}
             </Button>
           </div>

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { SITE_CONFIG } from '@/lib/config';
-import type { Product, Locale } from '@/lib/types';
+import { getLocalizedPath } from '@/lib/routing';
+import type { Locale, Product } from '@/lib/types';
 
 interface ProductActionsProps {
   product: Product;
@@ -46,21 +47,25 @@ export function ProductActions({ product, locale = 'sq' }: ProductActionsProps) 
   const toggleWishlist = () => {
     const stored = localStorage.getItem('novara_wishlist');
     const arr: string[] = stored ? JSON.parse(stored) : [];
-    let newArr;
+    let nextArr;
+
     if (arr.includes(product.id)) {
-      newArr = arr.filter((id) => id !== product.id);
+      nextArr = arr.filter((id) => id !== product.id);
       setWishlisted(false);
     } else {
-      newArr = [...arr, product.id];
+      nextArr = [...arr, product.id];
       setWishlisted(true);
     }
-    localStorage.setItem('novara_wishlist', JSON.stringify(newArr));
+
+    localStorage.setItem('novara_wishlist', JSON.stringify(nextArr));
   };
 
   const productName = locale === 'sq' ? product.name_sq : product.name_en;
   const message = encodeURIComponent(t.whatsappMsg(productName));
   const whatsappUrl = `https://wa.me/${SITE_CONFIG.contact.whatsapp}?text=${message}`;
-  const visitUrl = `/#contact?product=${product.slug}&type=showroom_visit`;
+  const visitUrl = `${getLocalizedPath(locale, 'home')}?product=${encodeURIComponent(
+    product.slug
+  )}&type=showroom_visit#contact`;
 
   return (
     <div className="space-y-4">

@@ -5,6 +5,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { getAllCategories } from '@/lib/data/queries';
 import { getSiteContentMap, t } from '@/lib/data/content';
 import { getProductSvgKey } from '@/lib/data/helpers';
+import { getLocalizedPath } from '@/lib/routing';
 import type { Locale } from '@/lib/types';
 
 const SVGs: Record<string, JSX.Element> = {
@@ -102,7 +103,7 @@ export async function Collections({ locale = 'sq' }: { locale?: Locale }) {
             return (
               <Link
                 key={cat.id}
-                href={`/koleksione/${cat.slug}`}
+                href={getLocalizedPath(locale, 'category', { slug: cat.slug })}
                 className={`reveal group cursor-pointer no-underline text-inherit ${
                   isFeatured ? 'lg:col-span-2 lg:row-span-2' : ''
                 }`}

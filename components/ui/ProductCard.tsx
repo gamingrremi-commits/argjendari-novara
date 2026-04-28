@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductSvg } from '@/components/ui/ProductSvg';
 import { getProductSvgKey } from '@/lib/data/helpers';
-import type { Product, Category, Locale } from '@/lib/types';
+import { getLocalizedPath } from '@/lib/routing';
+import type { Category, Locale, Product } from '@/lib/types';
+import { formatPriceEUR, formatPriceLEK } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -18,11 +20,10 @@ export function ProductCard({ product, category, locale = 'sq' }: ProductCardPro
   const [mounted, setMounted] = useState(false);
 
   const t = {
-    sq: { ask: 'Pyet', sold: 'I shitur', new: 'Risi' },
-    en: { ask: 'Ask', sold: 'Sold', new: 'New' },
+    sq: { ask: 'Pyet', sold: 'I shitur' },
+    en: { ask: 'Ask', sold: 'Sold' },
   }[locale];
 
-  // Read wishlist from localStorage
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined') {
@@ -34,20 +35,22 @@ export function ProductCard({ product, category, locale = 'sq' }: ProductCardPro
     }
   }, [product.id]);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const toggleWishlist = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     const stored = localStorage.getItem('novara_wishlist');
     const arr: string[] = stored ? JSON.parse(stored) : [];
-    let newArr;
+    let nextArr;
+
     if (arr.includes(product.id)) {
-      newArr = arr.filter((id) => id !== product.id);
+      nextArr = arr.filter((id) => id !== product.id);
       setWishlisted(false);
     } else {
-      newArr = [...arr, product.id];
+      nextArr = [...arr, product.id];
       setWishlisted(true);
     }
-    localStorage.setItem('novara_wishlist', JSON.stringify(newArr));
+
+    localStorage.setItem('novara_wishlist', JSON.stringify(nextArr));
   };
 
   const productName = locale === 'sq' ? product.name_sq : product.name_en;
@@ -55,10 +58,16 @@ export function ProductCard({ product, category, locale = 'sq' }: ProductCardPro
   const badge = locale === 'sq' ? product.badge_sq : product.badge_en;
   const hasImage = product.images && product.images.length > 0;
   const svgKey = category ? getProductSvgKey(category.slug) : 'ring';
+  const priceLabel =
+    product.show_price && product.price_eur !== null
+      ? formatPriceEUR(product.price_eur)
+      : product.show_price && product.price_lek !== null
+        ? formatPriceLEK(product.price_lek)
+        : t.ask;
 
   return (
     <Link
-      href={`/produkt/${product.slug}`}
+      href={getLocalizedPath(locale, 'product', { slug: product.slug })}
       className="reveal group cursor-pointer no-underline text-inherit block"
     >
       <div className="aspect-square relative overflow-hidden mb-5 border border-line bg-gradient-to-br from-pearl-warm to-[#DDD3BC]">
@@ -118,7 +127,7 @@ export function ProductCard({ product, category, locale = 'sq' }: ProductCardPro
       <div className="font-serif text-base text-ink flex justify-between items-baseline">
         <span className="truncate pr-2">{product.material}</span>
         <span className="text-[11px] tracking-widest uppercase text-gold-dark font-sans font-medium shrink-0">
-          {t.ask}
+          {priceLabel}
         </span>
       </div>
     </Link>

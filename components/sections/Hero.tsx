@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { getSiteContentMap, t } from '@/lib/data/content';
+import { getLocalizedPath } from '@/lib/routing';
 import type { Locale } from '@/lib/types';
 
 export async function Hero({ locale = 'sq' }: { locale?: Locale }) {
@@ -34,10 +35,10 @@ export async function Hero({ locale = 'sq' }: { locale?: Locale }) {
           </p>
 
           <div className="flex gap-5 items-center flex-wrap opacity-0 animate-[fadeUp_1.2s_0.9s_forwards]">
-            <Button href="/koleksione" variant="primary">
+            <Button href={getLocalizedPath(locale, 'collections')} variant="primary">
               {t(c, 'hero.cta_primary')}
             </Button>
-            <Button href="/atelier" variant="secondary">
+            <Button href={getLocalizedPath(locale, 'atelier')} variant="secondary">
               {t(c, 'hero.cta_secondary')}
             </Button>
           </div>

@@ -1,20 +1,16 @@
 'use client';
 
-import { useState, forwardRef } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { ContactFormSchema, BOOKING_TYPE_LABELS, type ContactFormData } from '@/lib/validations/contact';
+import {
+  BOOKING_TYPE_LABELS,
+  getContactFormSchema,
+  isBookingType,
+  type ContactFormData,
+} from '@/lib/validations/contact';
 import type { Locale } from '@/lib/types';
-
-const FIELD_LABELS: Record<string, string> = {
-  first_name: 'Emri',
-  last_name: 'Mbiemri',
-  email: 'Email',
-  phone: 'Telefon',
-  type: 'Lloji i kërkesës',
-  message: 'Mesazhi',
-  preferred_date: 'Data',
-};
 
 interface ContactFormProps {
   locale?: Locale;
@@ -22,11 +18,33 @@ interface ContactFormProps {
   defaultProductSlug?: string;
 }
 
+const FIELD_LABELS = {
+  sq: {
+    first_name: 'Emri',
+    last_name: 'Mbiemri',
+    email: 'Email',
+    phone: 'Telefon',
+    type: 'Lloji i kërkesës',
+    message: 'Mesazhi',
+    preferred_date: 'Data',
+  },
+  en: {
+    first_name: 'First name',
+    last_name: 'Last name',
+    email: 'Email',
+    phone: 'Phone',
+    type: 'Request type',
+    message: 'Message',
+    preferred_date: 'Date',
+  },
+} as const;
+
 export function ContactForm({
   locale = 'sq',
   defaultType = 'showroom_visit',
   defaultProductSlug,
 }: ContactFormProps) {
+  const searchParams = useSearchParams();
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -85,26 +103,45 @@ export function ContactForm({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<ContactFormData>({
     defaultValues: {
       type: defaultType,
       product_slug: defaultProductSlug,
+      locale,
       website: '',
     },
   });
 
+  useEffect(() => {
+    setValue('locale', locale);
+  }, [locale, setValue]);
+
+  useEffect(() => {
+    const typeParam = searchParams.get('type');
+    const productParam = searchParams.get('product');
+
+    if (typeParam && isBookingType(typeParam)) {
+      setValue('type', typeParam);
+    }
+
+    if (productParam) {
+      setValue('product_slug', productParam);
+    }
+  }, [searchParams, setValue]);
+
   const onSubmit = async (data: ContactFormData) => {
     setSubmitting(true);
 
-    // Client-side validation
-    const result = ContactFormSchema.safeParse(data);
+    const result = getContactFormSchema(locale).safeParse(data);
     if (!result.success) {
-      // Show the FIRST specific error, not generic message
       const firstError = result.error.issues[0];
-      const fieldLabel = FIELD_LABELS[firstError.path[0] as string] || firstError.path[0];
+      const fieldLabel =
+        FIELD_LABELS[locale][firstError.path[0] as keyof (typeof FIELD_LABELS)[typeof locale]] ||
+        String(firstError.path[0]);
+
       toast.error(`${fieldLabel}: ${firstError.message}`);
-      console.error('Form validation errors:', result.error.flatten().fieldErrors);
       setSubmitting(false);
       return;
     }
@@ -130,9 +167,14 @@ export function ContactForm({
       }
 
       setSuccess(true);
-      reset();
+      reset({
+        type: defaultType,
+        product_slug: defaultProductSlug,
+        locale,
+        website: '',
+      });
       toast.success(t.successTitle);
-    } catch (err) {
+    } catch {
       toast.error(t.errorGeneric);
     } finally {
       setSubmitting(false);
@@ -165,7 +207,6 @@ export function ContactForm({
       <p className="font-serif italic text-base text-ink mb-8">{t.subtitle}</p>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        {/* Honeypot — hidden field for bots */}
         <input
           type="text"
           {...register('website')}
@@ -176,6 +217,7 @@ export function ContactForm({
         />
 
         <input type="hidden" {...register('product_slug')} />
+        <input type="hidden" {...register('locale')} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField
@@ -217,9 +259,9 @@ export function ContactForm({
             {...register('type')}
             className="w-full py-3.5 px-0 border-0 border-b border-line bg-transparent font-serif text-lg text-ink-black outline-none focus:border-gold transition-colors cursor-pointer"
           >
-            {Object.entries(BOOKING_TYPE_LABELS[locale]).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
+            {Object.entries(BOOKING_TYPE_LABELS[locale]).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
               </option>
             ))}
           </select>
@@ -242,9 +284,7 @@ export function ContactForm({
             rows={3}
             className="w-full py-3.5 px-0 border-0 border-b border-line bg-transparent font-serif text-lg text-ink-black outline-none focus:border-gold transition-colors resize-y min-h-[80px] placeholder:text-ink/40"
           />
-          {errors.message && (
-            <p className="mt-2 text-xs text-red-700">{errors.message.message}</p>
-          )}
+          {errors.message && <p className="mt-2 text-xs text-red-700">{errors.message.message}</p>}
         </div>
 
         <button

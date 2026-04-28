@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Cormorant_Garamond, Italiana } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { buildOgImageUrl, getSiteUrl } from '@/lib/seo';
 import './globals.css';
 
 const inter = Inter({
@@ -26,29 +27,44 @@ const italiana = Italiana({
 });
 
 export const metadata: Metadata = {
-  title: 'NOVARA — Argjendari & Bizhuteri | Durrës',
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: 'NOVARA â€” Argjendari Novara',
+    template: '%s',
+  },
+  applicationName: 'NOVARA',
   description:
-    'Argjendari Novara — bizhuteri të zgjedhura me dorë në zemër të Durrësit. Unaza fejese, gjerdanë, vathë dhe porosi me dizajn personal.',
-  keywords: [
-    'argjendari',
-    'bizhuteri',
-    'unaza fejese',
-    'durres',
-    'shqiperia',
-    'argjendari novara',
-    'jewelry',
-    'engagement rings',
-  ],
+    'NOVARA â€” handcrafted jewelry, bespoke atelier work, and premium services from the heart of DurrÃ«s.',
   openGraph: {
-    title: 'NOVARA — Argjendari & Bizhuteri',
-    description: 'Bizhuteri me dorë, me histori. Që nga 2014, në Durrës.',
+    title: 'NOVARA â€” Argjendari Novara',
+    description: 'Handcrafted jewelry with a story. Since 2014, in DurrÃ«s.',
     type: 'website',
     locale: 'sq_AL',
     alternateLocale: 'en_US',
+    images: [
+      {
+        url: buildOgImageUrl({
+          locale: 'sq',
+          title: 'NOVARA',
+          eyebrow: 'Argjendari ne Durres',
+          description: 'Bizhuteri me dore, me histori. Qe nga 2014.',
+        }),
+        width: 1200,
+        height: 630,
+        alt: 'NOVARA',
+      },
+    ],
   },
   robots: {
     index: true,
     follow: true,
+  },
+  alternates: {
+    languages: {
+      'sq-AL': '/',
+      'en-US': '/en',
+      'x-default': '/',
+    },
   },
 };
 
@@ -62,6 +78,11 @@ export default function RootLayout({
       lang="sq"
       className={`${inter.variable} ${cormorant.variable} ${italiana.variable}`}
     >
+      <head>
+        <link rel="preconnect" href="https://tkonfvqmvgwvsybdmbfz.supabase.co" />
+        <link rel="preconnect" href="https://www.google.com" />
+        <link rel="dns-prefetch" href="https://maps.google.com" />
+      </head>
       <body>
         {children}
         <Toaster

@@ -4,6 +4,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { getAllCategories, getFeaturedProducts } from '@/lib/data/queries';
 import { getSiteContentMap, t } from '@/lib/data/content';
+import { getLocalizedPath } from '@/lib/routing';
 import type { Locale } from '@/lib/types';
 
 export async function Featured({ locale = 'sq' }: { locale?: Locale }) {
@@ -23,7 +24,8 @@ export async function Featured({ locale = 'sq' }: { locale?: Locale }) {
     </>
   );
 
-  const emptyMsg = locale === 'sq' ? 'Koleksioni i ri po vjen së shpejti.' : 'New collection coming soon.';
+  const emptyMsg =
+    locale === 'sq' ? 'Koleksioni i ri po vjen së shpejti.' : 'New collection coming soon.';
 
   return (
     <section id="featured" className="py-[140px] px-12 bg-pearl">
@@ -50,7 +52,7 @@ export async function Featured({ locale = 'sq' }: { locale?: Locale }) {
         )}
 
         <div className="text-center mt-20">
-          <Button href="/koleksione" variant="primary">
+          <Button href={getLocalizedPath(locale, 'collections')} variant="primary">
             {t(c, 'featured.cta')}
           </Button>
         </div>

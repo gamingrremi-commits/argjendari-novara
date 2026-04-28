@@ -1,9 +1,10 @@
 import { Container } from '@/components/ui/Container';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { getSiteContentMap, t } from '@/lib/data/content';
+import { getLocalizedHomeHash } from '@/lib/routing';
 import type { Locale } from '@/lib/types';
 
-const ICONS = ['◇', '⚏', '⌖', '⊙', '⊕', '⌘'];
+const ICONS = ['◇', '✏', '⌖', '⊙', '⊕', '⌘'];
 
 export async function Services({ locale = 'sq' }: { locale?: Locale }) {
   const c = await getSiteContentMap(locale);
@@ -50,7 +51,7 @@ export async function Services({ locale = 'sq' }: { locale?: Locale }) {
                   {t(c, `service${n}.description`)}
                 </p>
                 <a
-                  href="/#contact"
+                  href={getLocalizedHomeHash(locale, 'contact')}
                   className="text-[11px] tracking-widest uppercase text-gold-dark inline-flex items-center gap-3 font-medium transition-all duration-400 group-hover:text-gold-light"
                 >
                   {ctaLabel}

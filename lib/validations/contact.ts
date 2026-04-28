@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { Locale } from '@/lib/types';
 
 export const BookingTypeEnum = z.enum([
   'showroom_visit',
@@ -9,40 +10,78 @@ export const BookingTypeEnum = z.enum([
   'general',
 ]);
 
+export const BOOKING_TYPES = BookingTypeEnum.options;
+
 export type BookingType = z.infer<typeof BookingTypeEnum>;
 
-// Helper: turn empty strings into undefined for optional fields
+const VALIDATION_MESSAGES = {
+  sq: {
+    firstNameMin: 'Emri duhet të ketë të paktën 2 karaktere',
+    firstNameMax: 'Emri është shumë i gjatë',
+    lastNameMin: 'Mbiemri duhet të ketë të paktën 2 karaktere',
+    lastNameMax: 'Mbiemri është shumë i gjatë',
+    email: 'Email i pavlefshëm',
+    phoneMin: 'Telefon i pavlefshëm (min 6 shifra)',
+    phoneMax: 'Telefon i pavlefshëm',
+    phonePattern: 'Telefoni mund të përmbajë vetëm numra, hapësira, +, -, ( )',
+    messageMax: 'Mesazhi është shumë i gjatë',
+    bot: 'Bot detected',
+  },
+  en: {
+    firstNameMin: 'First name must be at least 2 characters',
+    firstNameMax: 'First name is too long',
+    lastNameMin: 'Last name must be at least 2 characters',
+    lastNameMax: 'Last name is too long',
+    email: 'Invalid email address',
+    phoneMin: 'Invalid phone number (minimum 6 digits)',
+    phoneMax: 'Invalid phone number',
+    phonePattern: 'Phone can contain only numbers, spaces, +, -, ( )',
+    messageMax: 'Message is too long',
+    bot: 'Bot detected',
+  },
+} as const;
+
 const optionalString = z
   .string()
   .optional()
-  .transform((v) => (v === '' ? undefined : v));
+  .transform((value) => (value === '' ? undefined : value));
 
-export const ContactFormSchema = z.object({
-  first_name: z
-    .string()
-    .min(2, 'Emri duhet të ketë të paktën 2 karaktere')
-    .max(50, 'Emri është shumë i gjatë'),
-  last_name: z
-    .string()
-    .min(2, 'Mbiemri duhet të ketë të paktën 2 karaktere')
-    .max(50, 'Mbiemri është shumë i gjatë'),
-  email: z.string().email('Email i pavlefshëm').max(200),
-  phone: z
-    .string()
-    .min(6, 'Telefon i pavlefshëm (min 6 shifra)')
-    .max(20, 'Telefon i pavlefshëm')
-    .regex(/^[\d\s+\-()]+$/, 'Telefoni mund të përmbajë vetëm numra, hapësira, +, -, ( )'),
-  type: BookingTypeEnum,
-  message: z
-    .string()
-    .max(2000, 'Mesazhi është shumë i gjatë')
-    .optional()
-    .transform((v) => (v === '' ? undefined : v)),
-  preferred_date: optionalString,
-  product_slug: optionalString,
-  // Honeypot — should always be empty for real users
-  website: z.string().max(0, 'Bot detected').optional().or(z.literal('')),
-});
+export function isBookingType(value: string): value is BookingType {
+  return (BOOKING_TYPES as readonly string[]).includes(value);
+}
+
+export function getContactFormSchema(locale: Locale = 'sq') {
+  const messages = VALIDATION_MESSAGES[locale];
+
+  return z.object({
+    first_name: z
+      .string()
+      .min(2, messages.firstNameMin)
+      .max(50, messages.firstNameMax),
+    last_name: z
+      .string()
+      .min(2, messages.lastNameMin)
+      .max(50, messages.lastNameMax),
+    email: z.string().email(messages.email).max(200),
+    phone: z
+      .string()
+      .min(6, messages.phoneMin)
+      .max(20, messages.phoneMax)
+      .regex(/^[\d\s+\-()]+$/, messages.phonePattern),
+    type: BookingTypeEnum,
+    message: z
+      .string()
+      .max(2000, messages.messageMax)
+      .optional()
+      .transform((value) => (value === '' ? undefined : value)),
+    preferred_date: optionalString,
+    product_slug: optionalString,
+    locale: z.enum(['sq', 'en']).optional().default(locale),
+    website: z.string().max(0, messages.bot).optional().or(z.literal('')),
+  });
+}
+
+export const ContactFormSchema = getContactFormSchema('sq');
 
 export type ContactFormData = z.infer<typeof ContactFormSchema>;
 

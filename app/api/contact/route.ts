@@ -1,13 +1,32 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { ContactFormSchema } from '@/lib/validations/contact';
 import { adminNotificationHtml, clientConfirmationHtml } from '@/lib/email/templates';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { BOOKING_TYPE_LABELS, getContactFormSchema } from '@/lib/validations/contact';
+import type { Locale } from '@/lib/types';
 
-// Simple in-memory rate limiter (per IP, per minute)
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const MAX_REQUESTS = 3;
 const WINDOW_MS = 60 * 1000;
+
+const API_MESSAGES = {
+  sq: {
+    rateLimit: 'Shumë kërkesa. Provo përsëri pas një minute.',
+    invalid: 'Të dhënat janë të pavlefshme',
+    emailConfig: 'Shërbimi i email-it nuk është konfiguruar',
+    sendFailed: 'Mesazhi nuk u dërgua. Provo përsëri.',
+    unexpected: 'Gabim i papritur. Provo përsëri.',
+    clientSubject: 'Mesazhi juaj erdhi në Novara',
+  },
+  en: {
+    rateLimit: 'Too many requests. Please try again in one minute.',
+    invalid: 'The submitted data is invalid',
+    emailConfig: 'The email service is not configured',
+    sendFailed: 'Your message could not be sent. Please try again.',
+    unexpected: 'Unexpected error. Please try again.',
+    clientSubject: 'Your message reached Novara',
+  },
+} as const;
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -24,7 +43,6 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// Cleanup old entries periodically
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now();
@@ -35,28 +53,32 @@ if (typeof setInterval !== 'undefined') {
 }
 
 export async function POST(req: Request) {
+  let requestLocale: Locale = 'sq';
+
   try {
-    // Rate limiting
+    const body = await req.json().catch(() => null);
+    requestLocale = body?.locale === 'en' ? 'en' : 'sq';
+    const messages = API_MESSAGES[requestLocale];
+
     const ip =
       req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
       req.headers.get('x-real-ip') ||
       'unknown';
 
     if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: 'Shumë kërkesa. Provo përsëri pas një minute.' },
-        { status: 429 }
-      );
+      return NextResponse.json({ error: messages.rateLimit }, { status: 429 });
     }
 
-    // Parse + validate
-    const body = await req.json();
-    const result = ContactFormSchema.safeParse(body);
+    if (!body) {
+      return NextResponse.json({ error: messages.invalid }, { status: 400 });
+    }
+
+    const result = getContactFormSchema(requestLocale).safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
         {
-          error: 'Të dhënat janë të pavlefshme',
+          error: messages.invalid,
           details: result.error.flatten().fieldErrors,
         },
         { status: 400 }
@@ -65,13 +87,10 @@ export async function POST(req: Request) {
 
     const data = result.data;
 
-    // Honeypot check
     if (data.website && data.website.length > 0) {
-      // Pretend success to fool bots
       return NextResponse.json({ success: true });
     }
 
-    // Save to Supabase (best effort — don't fail email if DB fails)
     let supabaseError: string | null = null;
     try {
       const supabase = createAdminClient();
@@ -86,67 +105,61 @@ export async function POST(req: Request) {
         product_slug: data.product_slug || null,
         status: 'new',
       });
+
       if (error) {
         supabaseError = error.message;
         console.warn('Supabase insert failed:', error.message);
       }
-    } catch (err) {
-      supabaseError = err instanceof Error ? err.message : 'unknown';
-      console.warn('Supabase admin client error:', err);
+    } catch (error) {
+      supabaseError = error instanceof Error ? error.message : 'unknown';
+      console.warn('Supabase admin client error:', error);
     }
 
-    // Send emails via Resend
     if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY missing');
-      return NextResponse.json(
-        { error: 'Email service not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: messages.emailConfig }, { status: 500 });
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromAddr = process.env.CONTACT_EMAIL_FROM || 'onboarding@resend.dev';
     const toAddr = process.env.CONTACT_EMAIL_TO || 'gamingrremi@gmail.com';
+    const typeLabel = BOOKING_TYPE_LABELS[requestLocale][data.type];
 
-    // 1. Email to admin (you)
     try {
       await resend.emails.send({
         from: `Novara Website <${fromAddr}>`,
         to: [toAddr],
         replyTo: data.email,
-        subject: `[NOVARA] ${data.first_name} ${data.last_name} — ${data.type}`,
-        html: adminNotificationHtml(data),
+        subject: `[NOVARA] ${data.first_name} ${data.last_name} — ${typeLabel}`,
+        html: adminNotificationHtml({ ...data, locale: requestLocale }),
       });
-    } catch (err) {
-      console.error('Admin email failed:', err);
-      return NextResponse.json(
-        { error: 'Mesazhi nuk u dërgua. Provo përsëri.' },
-        { status: 500 }
-      );
+    } catch (error) {
+      console.error('Admin email failed:', error);
+      return NextResponse.json({ error: messages.sendFailed }, { status: 500 });
     }
 
-    // 2. Confirmation email to client (best effort)
     try {
       await resend.emails.send({
         from: `Argjendari Novara <${fromAddr}>`,
         to: [data.email],
-        subject: 'Mesazhi juaj erdhi në Novara',
-        html: clientConfirmationHtml({ first_name: data.first_name, type: data.type }),
+        subject: messages.clientSubject,
+        html: clientConfirmationHtml({
+          first_name: data.first_name,
+          type: data.type,
+          locale: requestLocale,
+        }),
       });
-    } catch (err) {
-      console.warn('Client confirmation email failed:', err);
-      // Don't fail the request if just the confirmation fails
+    } catch (error) {
+      console.warn('Client confirmation email failed:', error);
     }
 
     return NextResponse.json({
       success: true,
       saved_to_db: !supabaseError,
     });
-  } catch (err) {
-    console.error('Contact API error:', err);
-    return NextResponse.json(
-      { error: 'Gabim i papritur. Provo përsëri.' },
-      { status: 500 }
-    );
+  } catch (error) {
+    console.error('Contact API error:', error);
+    const messages = API_MESSAGES[requestLocale];
+
+    return NextResponse.json({ error: messages.unexpected }, { status: 500 });
   }
 }

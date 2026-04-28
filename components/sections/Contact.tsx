@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { getSiteContentMap, t, tList } from '@/lib/data/content';
 import type { Locale } from '@/lib/types';
@@ -44,7 +45,9 @@ export async function Contact({ locale = 'sq' }: { locale?: Locale }) {
         </div>
 
         <div className="reveal">
-          <ContactForm locale={locale} />
+          <Suspense fallback={<div className="bg-pearl border border-line min-h-[520px]" />}>
+            <ContactForm locale={locale} />
+          </Suspense>
         </div>
       </div>
     </section>

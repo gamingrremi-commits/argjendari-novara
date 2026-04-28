@@ -1,24 +1,26 @@
 import Link from 'next/link';
 import { SITE_CONFIG } from '@/lib/config';
+import { getLocalizedHomeHash, getLocalizedPath } from '@/lib/routing';
+import type { Locale } from '@/lib/types';
 
 const FOOTER_CONTENT = {
   sq: {
     explore: {
       title: 'Eksploro',
       links: [
-        { label: 'Koleksionet', href: '/koleksione' },
-        { label: 'Atelier', href: '/atelier' },
-        { label: 'Shërbime', href: '/sherbime' },
-        { label: 'Dyqani', href: '/#location' },
+        { label: 'Koleksionet', href: (locale: Locale) => getLocalizedPath(locale, 'collections') },
+        { label: 'Atelier', href: (locale: Locale) => getLocalizedPath(locale, 'atelier') },
+        { label: 'Shërbime', href: (locale: Locale) => getLocalizedPath(locale, 'services') },
+        { label: 'Dyqani', href: (locale: Locale) => getLocalizedHomeHash(locale, 'location') },
       ],
     },
     services: {
       title: 'Shërbime',
       links: [
-        { label: 'Konsulencë Fejese', href: '/sherbime' },
-        { label: 'Porosi Personale', href: '/atelier' },
-        { label: 'Riparime', href: '/sherbime' },
-        { label: 'Vlerësim', href: '/sherbime' },
+        { label: 'Konsulencë Fejese', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=engagement_consultation#contact-services` },
+        { label: 'Porosi Personale', href: (locale: Locale) => getLocalizedPath(locale, 'atelier') },
+        { label: 'Riparime', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=repair#contact-services` },
+        { label: 'Vlerësim', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=appraisal#contact-services` },
       ],
     },
     contact: 'Kontakt',
@@ -29,40 +31,40 @@ const FOOTER_CONTENT = {
     explore: {
       title: 'Explore',
       links: [
-        { label: 'Collections', href: '/koleksione' },
-        { label: 'Atelier', href: '/atelier' },
-        { label: 'Services', href: '/sherbime' },
-        { label: 'Boutique', href: '/#location' },
+        { label: 'Collections', href: (locale: Locale) => getLocalizedPath(locale, 'collections') },
+        { label: 'Atelier', href: (locale: Locale) => getLocalizedPath(locale, 'atelier') },
+        { label: 'Services', href: (locale: Locale) => getLocalizedPath(locale, 'services') },
+        { label: 'Boutique', href: (locale: Locale) => getLocalizedHomeHash(locale, 'location') },
       ],
     },
     services: {
       title: 'Services',
       links: [
-        { label: 'Engagement Consultation', href: '/sherbime' },
-        { label: 'Custom Orders', href: '/atelier' },
-        { label: 'Repairs', href: '/sherbime' },
-        { label: 'Appraisal', href: '/sherbime' },
+        { label: 'Engagement Consultation', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=engagement_consultation#contact-services` },
+        { label: 'Custom Orders', href: (locale: Locale) => getLocalizedPath(locale, 'atelier') },
+        { label: 'Repairs', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=repair#contact-services` },
+        { label: 'Appraisal', href: (locale: Locale) => `${getLocalizedPath(locale, 'services')}?type=appraisal#contact-services` },
       ],
     },
     contact: 'Contact',
     rights: 'All rights reserved',
     by: 'Created by',
   },
-};
+} as const;
 
 interface FooterProps {
-  locale?: 'sq' | 'en';
+  locale?: Locale;
 }
 
 export function Footer({ locale = 'sq' }: FooterProps) {
-  const t = FOOTER_CONTENT[locale];
+  const content = FOOTER_CONTENT[locale];
 
   return (
     <footer className="bg-ink-black text-pearl pt-[100px] pb-10 px-12 border-t border-gold/15">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-16 mb-20 max-w-[1440px] mx-auto">
         <div>
           <Link
-            href="/"
+            href={getLocalizedPath(locale, 'home')}
             className="font-display text-[32px] tracking-[0.4em] text-pearl no-underline"
           >
             NOVARA
@@ -74,17 +76,17 @@ export function Footer({ locale = 'sq' }: FooterProps) {
 
         <div>
           <h4 className="text-[11px] tracking-widest uppercase text-gold-light mb-6 font-medium">
-            {t.explore.title}
+            {content.explore.title}
           </h4>
           <ul className="list-none">
-            {t.explore.links.map((link) => (
-              <li key={link.href} className="mb-3.5">
-                <a
-                  href={link.href}
+            {content.explore.links.map((link) => (
+              <li key={link.label} className="mb-3.5">
+                <Link
+                  href={link.href(locale)}
                   className="text-pearl-warm no-underline font-serif text-base transition-colors hover:text-gold-light"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -92,17 +94,17 @@ export function Footer({ locale = 'sq' }: FooterProps) {
 
         <div>
           <h4 className="text-[11px] tracking-widest uppercase text-gold-light mb-6 font-medium">
-            {t.services.title}
+            {content.services.title}
           </h4>
           <ul className="list-none">
-            {t.services.links.map((link) => (
-              <li key={link.href} className="mb-3.5">
-                <a
-                  href={link.href}
+            {content.services.links.map((link) => (
+              <li key={link.label} className="mb-3.5">
+                <Link
+                  href={link.href(locale)}
                   className="text-pearl-warm no-underline font-serif text-base transition-colors hover:text-gold-light"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -110,7 +112,7 @@ export function Footer({ locale = 'sq' }: FooterProps) {
 
         <div>
           <h4 className="text-[11px] tracking-widest uppercase text-gold-light mb-6 font-medium">
-            {t.contact}
+            {content.contact}
           </h4>
           <ul className="list-none">
             <li className="mb-3.5">
@@ -155,10 +157,10 @@ export function Footer({ locale = 'sq' }: FooterProps) {
 
       <div className="pt-8 border-t border-gold/15 flex flex-col md:flex-row justify-between items-center gap-4 max-w-[1440px] mx-auto text-[11px] tracking-[0.2em] uppercase text-pearl-warm">
         <span>
-          © {new Date().getFullYear()} {SITE_CONFIG.fullName} · {t.rights}
+          © {new Date().getFullYear()} {SITE_CONFIG.fullName} · {content.rights}
         </span>
         <span>
-          {t.by}{' '}
+          {content.by}{' '}
           <a
             href="https://develop24h.com"
             target="_blank"

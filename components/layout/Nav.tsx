@@ -2,24 +2,64 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { getAlternateLocale, getLocalizedHomeHash, getLocalizedPath, switchLocalePath } from '@/lib/routing';
+import type { Locale } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { NAV_LINKS } from '@/lib/config';
 
 interface NavProps {
-  locale?: 'sq' | 'en';
+  locale?: Locale;
 }
 
 export function Nav({ locale = 'sq' }: NavProps) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    let frameId = 0;
+
+    const updateScrolled = () => {
+      frameId = 0;
+      const nextValue = window.scrollY > 60;
+      setScrolled((previous) => (previous === nextValue ? previous : nextValue));
+    };
+
+    const handleScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(updateScrolled);
+    };
+
+    updateScrolled();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frameId) window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
-  const links = NAV_LINKS[locale];
+  const links =
+    locale === 'sq'
+      ? [
+          { href: getLocalizedPath(locale, 'collections'), label: 'Koleksione' },
+          { href: getLocalizedPath(locale, 'atelier'), label: 'Atelier' },
+          { href: getLocalizedPath(locale, 'services'), label: 'Shërbime' },
+          { href: getLocalizedHomeHash(locale, 'location'), label: 'Dyqani' },
+          { href: getLocalizedHomeHash(locale, 'contact'), label: 'Kontakt' },
+        ]
+      : [
+          { href: getLocalizedPath(locale, 'collections'), label: 'Collections' },
+          { href: getLocalizedPath(locale, 'atelier'), label: 'Atelier' },
+          { href: getLocalizedPath(locale, 'services'), label: 'Services' },
+          { href: getLocalizedHomeHash(locale, 'location'), label: 'Boutique' },
+          { href: getLocalizedHomeHash(locale, 'contact'), label: 'Contact' },
+        ];
+
+  const alternateLocale = getAlternateLocale(locale);
+  const localeSwitchHref = switchLocalePath(
+    pathname || getLocalizedPath(locale, 'home'),
+    alternateLocale
+  );
 
   return (
     <nav
@@ -31,7 +71,7 @@ export function Nav({ locale = 'sq' }: NavProps) {
       )}
     >
       <Link
-        href="/"
+        href={getLocalizedPath(locale, 'home')}
         className="font-display text-[28px] tracking-[0.4em] text-ink-black no-underline relative"
       >
         NOVARA
@@ -39,26 +79,22 @@ export function Nav({ locale = 'sq' }: NavProps) {
       </Link>
 
       <ul className="hidden lg:flex gap-[42px] list-none items-center">
-        {links.map((link) => {
-          const isHash = link.href.startsWith('/#') || link.href.startsWith('#');
-          const LinkComponent = isHash ? 'a' : Link;
-          return (
-            <li key={link.href}>
-              <LinkComponent
-                href={link.href}
-                className="text-ink no-underline text-[11px] tracking-widest uppercase font-normal py-1.5 relative transition-colors duration-300 hover:text-gold-dark group"
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-1/2 w-0 h-px bg-gold transition-all duration-400 -translate-x-1/2 group-hover:w-full" />
-              </LinkComponent>
-            </li>
-          );
-        })}
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="text-ink no-underline text-[11px] tracking-widest uppercase font-normal py-1.5 relative transition-colors duration-300 hover:text-gold-dark group"
+            >
+              {link.label}
+              <span className="absolute bottom-0 left-1/2 w-0 h-px bg-gold transition-all duration-400 -translate-x-1/2 group-hover:w-full" />
+            </Link>
+          </li>
+        ))}
       </ul>
 
       <div className="flex gap-1.5 items-center text-[10px] tracking-[0.2em] font-medium">
         <Link
-          href="/"
+          href={locale === 'sq' ? getLocalizedPath('sq', 'home') : localeSwitchHref}
           className={cn(
             'cursor-pointer px-1.5 py-1',
             locale === 'sq' ? 'text-gold-dark' : 'text-ink/40 hover:text-ink'
@@ -68,7 +104,7 @@ export function Nav({ locale = 'sq' }: NavProps) {
         </Link>
         <span className="opacity-30">/</span>
         <Link
-          href="/en"
+          href={locale === 'en' ? getLocalizedPath('en', 'home') : localeSwitchHref}
           className={cn(
             'cursor-pointer px-1.5 py-1',
             locale === 'en' ? 'text-gold-dark' : 'text-ink/40 hover:text-ink'

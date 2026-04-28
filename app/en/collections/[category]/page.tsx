@@ -2,20 +2,20 @@ import { SiteCategoryPage, getCategoryMetadata } from '@/components/pages/SiteCa
 import { getAllCategorySlugs } from '@/lib/data/queries';
 
 interface PageProps {
-  params: { kategori: string };
+  params: { category: string };
 }
 
 export const revalidate = 60;
 
 export async function generateStaticParams() {
   const slugs = await getAllCategorySlugs();
-  return slugs.map((entry) => ({ kategori: entry.slug }));
+  return slugs.map((entry) => ({ category: entry.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  return getCategoryMetadata('sq', params.kategori);
+  return getCategoryMetadata('en', params.category);
 }
 
-export default function CategoryPage({ params }: PageProps) {
-  return <SiteCategoryPage locale="sq" slug={params.kategori} />;
+export default function EnglishCategoryPage({ params }: PageProps) {
+  return <SiteCategoryPage locale="en" slug={params.category} />;
 }

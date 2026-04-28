@@ -13,9 +13,9 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  return getProductMetadata('sq', params.slug);
+  return getProductMetadata('en', params.slug);
 }
 
-export default function ProductPage({ params }: PageProps) {
-  return <SiteProductPage locale="sq" slug={params.slug} />;
+export default function EnglishProductPage({ params }: PageProps) {
+  return <SiteProductPage locale="en" slug={params.slug} />;
 }

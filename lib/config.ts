@@ -1,9 +1,10 @@
 export const SITE_CONFIG = {
   name: 'NOVARA',
   fullName: 'Argjendari Novara',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://argjendarinovara.al',
   tagline: {
-    sq: 'Bizhuteri me dorë, me histori. Që nga 2014, në Durrës.',
-    en: 'Handcrafted jewelry with a story. Since 2014, in Durrës.',
+    sq: 'Bizhuteri me dorÃ«, me histori. QÃ« nga 2014, nÃ« DurrÃ«s.',
+    en: 'Handcrafted jewelry with a story. Since 2014, in DurrÃ«s.',
   },
   founded: 2014,
   contact: {
@@ -14,10 +15,10 @@ export const SITE_CONFIG = {
   },
   address: {
     street: 'Sheshi Demokracia',
-    landmark_sq: 'Përballë Lulishtes 1 Maji',
+    landmark_sq: 'PÃ«rballÃ« Lulishtes 1 Maji',
     landmark_en: 'Across from Lulishtja 1 Maji',
-    city: 'Durrës',
-    country_sq: 'Shqipëri',
+    city: 'DurrÃ«s',
+    country_sq: 'ShqipÃ«ri',
     country_en: 'Albania',
     coordinates: {
       lat: 41.3182674,
@@ -26,33 +27,16 @@ export const SITE_CONFIG = {
   },
   hours: {
     sq: {
-      weekdays: 'E hënë – E shtunë: 09:00 – 20:00',
-      sunday: 'E diel: 10:00 – 18:00',
+      weekdays: 'E hÃ«nÃ« â€“ E shtunÃ«: 09:00 â€“ 20:00',
+      sunday: 'E diel: 10:00 â€“ 18:00',
     },
     en: {
-      weekdays: 'Mon – Sat: 09:00 – 20:00',
-      sunday: 'Sun: 10:00 – 18:00',
+      weekdays: 'Mon â€“ Sat: 09:00 â€“ 20:00',
+      sunday: 'Sun: 10:00 â€“ 18:00',
     },
   },
   social: {
     instagram: 'https://instagram.com/argjendarinovara',
     facebook: 'https://facebook.com/argjendarinovara',
   },
-} as const;
-
-export const NAV_LINKS = {
-  sq: [
-    { href: '/koleksione', label: 'Koleksione' },
-    { href: '/atelier', label: 'Atelier' },
-    { href: '/sherbime', label: 'Shërbime' },
-    { href: '/#location', label: 'Dyqani' },
-    { href: '/#contact', label: 'Kontakt' },
-  ],
-  en: [
-    { href: '/koleksione', label: 'Collections' },
-    { href: '/atelier', label: 'Atelier' },
-    { href: '/sherbime', label: 'Services' },
-    { href: '/#location', label: 'Boutique' },
-    { href: '/#contact', label: 'Contact' },
-  ],
 } as const;
