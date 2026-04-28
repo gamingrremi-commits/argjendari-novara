@@ -8,7 +8,6 @@ import { Container } from '@/components/ui/Container';
 import { ProductActions } from '@/components/ui/ProductActions';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ProductGallery } from '@/components/ui/ProductGallery';
-import { ProductModelViewer } from '@/components/ui/ProductModelViewer';
 import {
   getAllCategories,
   getProductBySlug,
@@ -194,6 +193,7 @@ export async function SiteProductPage({
                 images={product.images}
                 alt={productName}
                 svgFallback={svgKey}
+                modelUrl={product.model_url}
                 badge={locale === 'sq' ? product.badge_sq : product.badge_en || product.badge_sq}
                 inStock={product.in_stock}
                 soldLabel={copy.sold}
@@ -289,14 +289,6 @@ export async function SiteProductPage({
                     </>
                   )}
                 </div>
-
-                {product.model_url && (
-                  <ProductModelViewer
-                    src={product.model_url}
-                    alt={`${productName} 3D preview`}
-                    locale={locale}
-                  />
-                )}
 
                 <ProductActions product={product} locale={locale} />
 
