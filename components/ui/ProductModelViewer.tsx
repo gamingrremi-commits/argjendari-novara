@@ -1,6 +1,18 @@
 'use client';
 
 import Script from 'next/script';
+import type { CSSProperties } from 'react';
+
+const VIEWER_STYLE: CSSProperties = {
+  width: '100%',
+  height: '100%',
+  display: 'block',
+  backgroundColor: 'transparent',
+  border: '0',
+  outline: 'none',
+  // model-viewer reads this CSS variable for its default poster layer.
+  ['--poster-color' as keyof CSSProperties]: 'transparent',
+};
 
 export function ProductModelViewer({
   src,
@@ -21,13 +33,15 @@ export function ProductModelViewer({
       <model-viewer
         src={src}
         alt={alt}
+        loading="eager"
         camera-controls
         auto-rotate
         shadow-intensity="1"
         exposure="1"
         interaction-prompt="auto"
         touch-action="pan-y"
-        className={className ?? 'block h-full w-full bg-transparent'}
+        className={className}
+        style={VIEWER_STYLE}
       />
     </>
   );

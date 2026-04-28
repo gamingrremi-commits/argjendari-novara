@@ -111,7 +111,7 @@ export function ProductGallery({
           </div>
         )}
 
-        {badge && (
+        {badge && activeItem?.type !== 'model' && (
           <span className="absolute left-6 top-6 z-[2] bg-ink-black px-4 py-2 text-[10px] uppercase tracking-widest text-gold-light">
             {badge}
           </span>
@@ -147,7 +147,7 @@ export function ProductGallery({
             <ProductModelViewer
               src={activeItem.src}
               alt={`${alt} 3D preview`}
-              className="block h-full w-full bg-transparent"
+              className="h-full w-full"
             />
           </div>
         ) : (
