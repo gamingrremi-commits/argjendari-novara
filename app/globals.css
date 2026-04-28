@@ -84,3 +84,16 @@
     transform: translateY(0);
   }
 }
+
+/* Mobile marquee speed override — ensures the cycle is faster on small
+   viewports than the default 40s defined in tailwind.config.ts. Uses
+   !important so it wins over any Tailwind arbitrary-value utilities. */
+.marquee-mobile-fast {
+  animation-duration: 10s !important;
+}
+
+@media (min-width: 768px) {
+  .marquee-mobile-fast {
+    animation-duration: 40s !important;
+  }
+}
