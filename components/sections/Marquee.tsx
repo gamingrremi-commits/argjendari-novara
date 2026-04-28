@@ -4,7 +4,12 @@ import type { Locale } from '@/lib/types';
 export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
   const c = await getSiteContentMap(locale);
   const items = tList(c, 'marquee.items', [
-    'UNAZA FEJESE', 'DIZAJN PERSONAL', 'ARI 18K', 'DIAMANTE TË CERTIFIKUAR', 'RIPARIME EKSPERTE', 'PORTOFOL UNIK',
+    'UNAZA FEJESE',
+    'DIZAJN PERSONAL',
+    'ARI 18K',
+    'DIAMANTE TË CERTIFIKUAR',
+    'RIPARIME EKSPERTE',
+    'PORTOFOL UNIK',
   ]);
   const doubled = [...items, ...items];
 
@@ -18,4 +23,9 @@ export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
           >
             {item}
             <span className="text-gold text-sm">✦</span>
-        
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
