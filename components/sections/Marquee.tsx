@@ -10,7 +10,7 @@ export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
 
   return (
     <div className="bg-ink-black text-pearl-warm py-7 overflow-hidden border-y border-gold/20">
-      <div className="flex gap-20 animate-marquee whitespace-nowrap">
+      <div className="flex gap-20 animate-marquee whitespace-nowrap [animation-duration:20s] md:[animation-duration:40s]">
         {doubled.map((item, i) => (
           <span
             key={i}
@@ -18,9 +18,4 @@ export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
           >
             {item}
             <span className="text-gold text-sm">✦</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
+        
