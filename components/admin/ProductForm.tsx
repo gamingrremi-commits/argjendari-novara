@@ -36,6 +36,15 @@ function parseOptionalPrice(value: string) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : Number.NaN;
 }
 
+function isValidUrl(value: string) {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function ProductForm({ product, categories, mode }: ProductFormProps) {
   const router = useRouter();
   const supabase = createClient();
@@ -58,6 +67,7 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
     price_eur: product?.price_eur?.toString() ?? '',
     price_lek: product?.price_lek?.toString() ?? '',
     show_price: product?.show_price ?? false,
+    model_url: product?.model_url ?? '',
     badge_sq: product?.badge_sq ?? '',
     badge_en: product?.badge_en ?? '',
     in_stock: product?.in_stock ?? true,
@@ -168,11 +178,18 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
       return;
     }
 
+    if (form.model_url.trim() && !isValidUrl(form.model_url.trim())) {
+      toast.error('Linku 3D duhet të jetë URL e vlefshme');
+      setSaving(false);
+      return;
+    }
+
     const payload = {
       ...form,
       images,
       price_eur: priceEur,
       price_lek: priceLek,
+      model_url: form.model_url.trim() || null,
       description_sq: form.description_sq || null,
       description_en: form.description_en || null,
       material: form.material || null,
@@ -455,6 +472,21 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
                 />
               </Field>
             </div>
+          </Card>
+
+          <Card title="Model 3D">
+            <Field label="Linku i modelit (.glb)">
+              <input
+                type="url"
+                value={form.model_url}
+                onChange={(event) => setForm({ ...form, model_url: event.target.value })}
+                className="input"
+                placeholder="https://.../ring.glb"
+              />
+            </Field>
+            <p className="text-sm font-serif italic text-ink/60">
+              Nëse vendos një link `.glb`, produkti do të shfaqë një preview 3D në faqen publike.
+            </p>
           </Card>
 
           <Card title="Badge (opsionale)">

@@ -39,6 +39,7 @@ export interface Product {
   badge_sq: string | null;
   badge_en: string | null;
   images: string[];
+  model_url: string | null;
   display_order: number;
   is_active: boolean;
   created_at: string;

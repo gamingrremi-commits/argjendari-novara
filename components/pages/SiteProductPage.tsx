@@ -8,6 +8,7 @@ import { Container } from '@/components/ui/Container';
 import { ProductActions } from '@/components/ui/ProductActions';
 import { ProductCard } from '@/components/ui/ProductCard';
 import { ProductGallery } from '@/components/ui/ProductGallery';
+import { ProductModelViewer } from '@/components/ui/ProductModelViewer';
 import {
   getAllCategories,
   getProductBySlug,
@@ -288,6 +289,14 @@ export async function SiteProductPage({
                     </>
                   )}
                 </div>
+
+                {product.model_url && (
+                  <ProductModelViewer
+                    src={product.model_url}
+                    alt={`${productName} 3D preview`}
+                    locale={locale}
+                  />
+                )}
 
                 <ProductActions product={product} locale={locale} />
 

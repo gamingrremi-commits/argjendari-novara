@@ -45,11 +45,15 @@ create table if not exists public.products (
   badge_sq text,
   badge_en text,
   images text[] default array[]::text[],
+  model_url text,
   display_order int default 0,
   is_active boolean default true,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
 );
+
+alter table public.products
+  add column if not exists model_url text;
 
 create index if not exists products_slug_idx on public.products(slug);
 create index if not exists products_category_idx on public.products(category_id);
