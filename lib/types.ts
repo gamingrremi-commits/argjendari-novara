@@ -12,6 +12,7 @@ export interface Category {
   name_en: string;
   description_sq: string | null;
   description_en: string | null;
+  image: string | null;
   display_order: number;
   is_active: boolean;
   created_at: string;
