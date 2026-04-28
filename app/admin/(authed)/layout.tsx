@@ -7,6 +7,9 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
+// Admin pages must be dynamic — they require auth/cookies that aren't available at build time.
+export const dynamic = 'force-dynamic';
+
 export default async function AuthedAdminLayout({
   children,
 }: {

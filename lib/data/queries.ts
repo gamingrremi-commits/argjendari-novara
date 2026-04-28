@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createStaticClient } from '@/lib/supabase/static';
 import type { Product, Category } from '@/lib/types';
 
 /**
@@ -7,6 +8,9 @@ import type { Product, Category } from '@/lib/types';
  *
  * They mirror the mock helpers from lib/data/mock.ts but pull from the real DB.
  * If a query fails or returns nothing, they return empty arrays / null safely.
+ *
+ * NOTE: getAllProductSlugs and getAllCategorySlugs use a STATIC client (no cookies)
+ * because they're called from generateStaticParams() at build time.
  */
 
 export async function getAllCategories(): Promise<Category[]> {
@@ -130,9 +134,10 @@ export async function getRelatedProducts(
 
 /**
  * Get all product slugs — useful for generateStaticParams.
+ * Uses static client (no cookies) since this runs at BUILD time.
  */
 export async function getAllProductSlugs(): Promise<{ slug: string }[]> {
-  const supabase = createClient();
+  const supabase = createStaticClient();
   const { data } = await supabase
     .from('products')
     .select('slug')
@@ -141,7 +146,7 @@ export async function getAllProductSlugs(): Promise<{ slug: string }[]> {
 }
 
 export async function getAllCategorySlugs(): Promise<{ slug: string }[]> {
-  const supabase = createClient();
+  const supabase = createStaticClient();
   const { data } = await supabase
     .from('categories')
     .select('slug')
