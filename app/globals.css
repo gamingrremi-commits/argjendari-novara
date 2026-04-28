@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --gold: #C9A961;
+    --gold-light: #E5C989;
+    --gold-dark: #9B7F3F;
+    --black: #0A0A0A;
+    --black-soft: #161412;
+    --pearl: #F8F6F0;
+    --pearl-warm: #EDE7D9;
+    --ink: #2A2520;
+    --line: rgba(201, 169, 97, 0.18);
+  }
+
+  * {
+    @apply m-0 p-0 box-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans bg-pearl text-ink font-light leading-relaxed antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    mix-blend-mode: multiply;
+  }
+
+  ::selection {
+    background-color: var(--gold);
+    color: var(--black);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--pearl);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--gold-dark);
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply inline-flex items-center gap-3.5 text-[11px] tracking-widest uppercase text-gold-dark font-medium;
+  }
+
+  .eyebrow::before,
+  .eyebrow::after {
+    content: '';
+    @apply w-8 h-px bg-gold;
+  }
+
+  .eyebrow.left::after {
+    display: none;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
