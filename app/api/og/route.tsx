@@ -9,14 +9,14 @@ const size = {
 
 function truncate(value: string, maxLength: number) {
   if (value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength - 1)}â€¦`;
+  return `${value.slice(0, maxLength - 1)}…`;
 }
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const locale = searchParams.get('locale') === 'en' ? 'EN' : 'SQ';
   const eyebrow = truncate(
-    searchParams.get('eyebrow') || 'ARGJENDARI NOVARA â€¢ DURRES',
+    searchParams.get('eyebrow') || 'ARGJENDARI NOVARA • DURRES',
     48
   );
   const title = truncate(searchParams.get('title') || 'NOVARA', 64);
@@ -155,7 +155,7 @@ export async function GET(request: Request) {
                   color: '#C9A961',
                 }}
               >
-                Handcrafted Jewelry â€¢ Since 2014
+                Handcrafted Jewelry • Since 2014
               </span>
               <span
                 style={{
@@ -163,7 +163,7 @@ export async function GET(request: Request) {
                   color: 'rgba(248,246,240,0.8)',
                 }}
               >
-                Sheshi Demokracia â€¢ DurrÃ«s
+                Sheshi Demokracia • Durrës
               </span>
             </div>
 

@@ -29,15 +29,15 @@ const italiana = Italiana({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: 'NOVARA â€” Argjendari Novara',
+    default: 'NOVARA — Argjendari Novara',
     template: '%s',
   },
   applicationName: 'NOVARA',
   description:
-    'NOVARA â€” handcrafted jewelry, bespoke atelier work, and premium services from the heart of DurrÃ«s.',
+    'NOVARA — handcrafted jewelry, bespoke atelier work, and premium services from the heart of Durrës.',
   openGraph: {
-    title: 'NOVARA â€” Argjendari Novara',
-    description: 'Handcrafted jewelry with a story. Since 2014, in DurrÃ«s.',
+    title: 'NOVARA — Argjendari Novara',
+    description: 'Handcrafted jewelry with a story. Since 2014, in Durrës.',
     type: 'website',
     locale: 'sq_AL',
     alternateLocale: 'en_US',
