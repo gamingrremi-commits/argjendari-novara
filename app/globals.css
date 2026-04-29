@@ -85,15 +85,17 @@
   }
 }
 
-/* Mobile marquee speed override — ensures the cycle is faster on small
-   viewports than the default 40s defined in tailwind.config.ts. Uses
-   !important so it wins over any Tailwind arbitrary-value utilities. */
+/* Marquee speed — calibrated so items glide past the viewport at a calm,
+   readable pace. Mobile uses a shorter cycle because the visible portion
+   of the track is smaller, but not so short that the eye can't follow.
+   Uses !important to win over the shorthand `animation` declaration that
+   tailwind's animate-marquee utility emits. */
 .marquee-mobile-fast {
-  animation-duration: 10s !important;
+  animation-duration: 30s !important;
 }
 
 @media (min-width: 768px) {
   .marquee-mobile-fast {
-    animation-duration: 40s !important;
+    animation-duration: 80s !important;
   }
 }
