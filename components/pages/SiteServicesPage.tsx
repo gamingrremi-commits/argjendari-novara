@@ -9,6 +9,7 @@ import { getLocalizedPath } from '@/lib/routing';
 import { absoluteUrl, buildBreadcrumbSchema, buildPageMetadata } from '@/lib/seo';
 import type { BookingType } from '@/lib/validations/contact';
 import type { Locale } from '@/lib/types';
+import { getSiteContentMap, t, tList } from '@/lib/data/content';
 
 type ServiceContent = {
   num: string;
@@ -284,8 +285,9 @@ export function getServicesMetadata(locale: Locale): Metadata {
   });
 }
 
-export function SiteServicesPage({ locale }: { locale: Locale }) {
+export async function SiteServicesPage({ locale }: { locale: Locale }) {
   const content = SERVICES_PAGE[locale];
+  const c = await getSiteContentMap(locale);
   const servicesAnchorBase = getLocalizedPath(locale, 'services');
 
   return (
@@ -308,16 +310,16 @@ export function SiteServicesPage({ locale }: { locale: Locale }) {
             />
 
             <div className="mt-16 max-w-4xl">
-              <div className="eyebrow mb-6">{content.heroEyebrow}</div>
+              <div className="eyebrow mb-6">{t(c, 'services_page.hero_eyebrow', content.heroEyebrow)}</div>
               <h1 className="font-display text-display-lg text-ink-black leading-none mb-10">
-                {content.heroTitleMain}{' '}
+                {t(c, 'services_page.hero_title_main', content.heroTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-dark">
-                  {content.heroTitleAccent}
+                  {t(c, 'services_page.hero_title_accent', content.heroTitleAccent)}
                 </em>
                 .
               </h1>
               <p className="font-serif italic text-2xl text-ink leading-snug max-w-3xl">
-                {content.heroIntro}
+                {t(c, 'services_page.hero_intro', content.heroIntro)}
               </p>
             </div>
           </Container>
@@ -328,6 +330,8 @@ export function SiteServicesPage({ locale }: { locale: Locale }) {
             <div className="space-y-24">
               {content.services.map((service, index) => {
                 const serviceHref = `${servicesAnchorBase}?type=${service.bookingType}#contact-services`;
+                const servicePrefix = `services_page.service${service.num}`;
+                const serviceIncludes = tList(c, `${servicePrefix}_includes`, service.includes);
 
                 return (
                   <div
@@ -349,27 +353,27 @@ export function SiteServicesPage({ locale }: { locale: Locale }) {
                         N° {service.num}
                       </div>
                       <div className="absolute bottom-8 right-8 text-[10px] tracking-widest uppercase text-gold-dark">
-                        {service.duration}
+                        {t(c, `${servicePrefix}_duration`, service.duration)}
                       </div>
                     </div>
 
                     <div>
                       <h2 className="font-display text-display-sm text-ink-black mb-6">
-                        {service.title}
+                        {t(c, `services_page.service${service.num}_title`, service.title)}
                       </h2>
                       <p className="font-serif italic text-2xl text-gold-dark mb-6 leading-snug">
-                        {service.intro}
+                        {t(c, `services_page.service${service.num}_intro`, service.intro)}
                       </p>
                       <p className="font-serif text-lg text-ink leading-relaxed mb-8">
-                        {service.description}
+                        {t(c, `${servicePrefix}_description`, service.description)}
                       </p>
 
                       <div className="border-t border-line pt-6 mb-8">
                         <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-4 font-medium">
-                          {content.includesLabel}
+                          {t(c, 'services_page.includes_label', content.includesLabel)}
                         </div>
                         <ul className="space-y-2">
-                          {service.includes.map((item) => (
+                          {serviceIncludes.map((item) => (
                             <li key={item} className="flex gap-3 font-serif text-base text-ink">
                               <span className="text-gold-dark shrink-0 mt-1">→</span>
                               {item}
@@ -382,7 +386,7 @@ export function SiteServicesPage({ locale }: { locale: Locale }) {
                         href={serviceHref}
                         className="inline-flex items-center gap-3.5 text-[11px] tracking-widest uppercase font-medium text-ink-black border-b border-ink-black pb-1 hover:text-gold-dark hover:border-gold transition-colors"
                       >
-                        {content.reserveLabel} →
+                        {t(c, 'services_page.reserve_label', content.reserveLabel)} →
                       </a>
                     </div>
                   </div>
@@ -399,16 +403,16 @@ export function SiteServicesPage({ locale }: { locale: Locale }) {
         >
           <Container size="narrow">
             <div className="reveal text-center mb-12">
-              <div className="eyebrow mb-6">{content.contactEyebrow}</div>
+              <div className="eyebrow mb-6">{t(c, 'services_page.contact_eyebrow', content.contactEyebrow)}</div>
               <h2 className="font-display text-display-sm text-ink-black mb-6">
-                {content.contactTitleMain}{' '}
+                {t(c, 'services_page.contact_title_main', content.contactTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-dark">
-                  {content.contactTitleAccent}
+                  {t(c, 'services_page.contact_title_accent', content.contactTitleAccent)}
                 </em>
                 ?
               </h2>
               <p className="font-serif italic text-xl text-ink max-w-xl mx-auto">
-                {content.contactIntro}
+                {t(c, 'services_page.contact_intro', content.contactIntro)}
               </p>
             </div>
 

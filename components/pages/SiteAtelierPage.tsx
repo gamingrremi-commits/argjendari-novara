@@ -14,6 +14,7 @@ import {
   buildPageMetadata,
 } from '@/lib/seo';
 import type { Locale } from '@/lib/types';
+import { getSiteContentMap, t } from '@/lib/data/content';
 
 const ATELIER_PAGE = {
   sq: {
@@ -132,9 +133,14 @@ export function getAtelierMetadata(locale: Locale): Metadata {
   });
 }
 
-export function SiteAtelierPage({ locale }: { locale: Locale }) {
+export async function SiteAtelierPage({ locale }: { locale: Locale }) {
   const content = ATELIER_PAGE[locale];
+  const c = await getSiteContentMap(locale);
   const contactHref = `${getLocalizedPath(locale, 'atelier')}#contact-atelier`;
+  const startingPrice = t(c, 'atelier_page.starting_price', '800 EUR');
+  const faqs = content.faqs.map((faq, index) =>
+    index === 0 ? { ...faq, a: faq.a.replace('800 EUR', startingPrice) } : faq
+  );
 
   return (
     <>
@@ -147,7 +153,7 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
       />
       <JsonLd
         id={`atelier-faq-${locale}`}
-        data={buildFaqSchema(content.faqs.map((faq) => ({ question: faq.q, answer: faq.a })))}
+        data={buildFaqSchema(faqs.map((faq) => ({ question: faq.q, answer: faq.a })))}
       />
       <SiteShell locale={locale}>
         <section
@@ -167,21 +173,21 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
 
             <div className="mt-16 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-20 items-center">
               <div>
-                <div className="eyebrow mb-6">{content.heroEyebrow}</div>
+                <div className="eyebrow mb-6">{t(c, 'atelier_page.hero_eyebrow', content.heroEyebrow)}</div>
                 <h1 className="font-display text-display-xl text-ink-black leading-[0.92] mb-10">
-                  {content.heroTitleLine1}
+                  {t(c, 'atelier_page.hero_title_line1', content.heroTitleLine1)}
                   <br />
                   <em className="font-serif italic font-light text-gold-dark">
-                    {content.heroTitleAccent}
+                    {t(c, 'atelier_page.hero_title_accent', content.heroTitleAccent)}
                   </em>{' '}
                   <br />
-                  {content.heroTitleLine2}
+                  {t(c, 'atelier_page.hero_title_line2', content.heroTitleLine2)}
                 </h1>
                 <p className="font-serif italic text-2xl text-ink leading-snug mb-12 max-w-xl">
-                  {content.heroIntro}
+                  {t(c, 'atelier_page.hero_intro', content.heroIntro)}
                 </p>
                 <Button href={contactHref} variant="primary">
-                  {content.heroCta}
+                  {t(c, 'atelier_page.hero_cta', content.heroCta)}
                 </Button>
               </div>
 
@@ -214,15 +220,15 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
         <section className="py-32 px-12 bg-pearl">
           <Container>
             <div className="reveal text-center mb-24">
-              <div className="eyebrow mb-6">{content.processEyebrow}</div>
+              <div className="eyebrow mb-6">{t(c, 'atelier_page.process_eyebrow', content.processEyebrow)}</div>
               <h2 className="font-display text-display-md text-ink-black mb-6">
-                {content.processTitleMain}{' '}
+                {t(c, 'atelier_page.process_title_main', content.processTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-dark">
-                  {content.processTitleAccent}
+                  {t(c, 'atelier_page.process_title_accent', content.processTitleAccent)}
                 </em>
               </h2>
               <p className="font-serif italic text-xl text-ink max-w-2xl mx-auto">
-                {content.processIntro}
+                {t(c, 'atelier_page.process_intro', content.processIntro)}
               </p>
             </div>
 
@@ -237,14 +243,14 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
                   </div>
                   <div>
                     <h3 className="font-display text-3xl text-ink-black group-hover:text-pearl mb-3 transition-colors duration-500">
-                      {step.title}
+                      {t(c, `atelier_page.process_step${step.num}_title`, step.title)}
                     </h3>
                     <p className="font-serif italic text-lg text-ink group-hover:text-pearl-warm leading-snug transition-colors duration-500">
-                      {step.desc}
+                      {t(c, `atelier_page.process_step${step.num}_desc`, step.desc)}
                     </p>
                   </div>
                   <div className="text-[10px] tracking-widest uppercase text-gold-dark group-hover:text-gold-light transition-colors duration-500 md:text-right">
-                    {step.duration}
+                    {t(c, `atelier_page.process_step${step.num}_duration`, step.duration)}
                   </div>
                 </div>
               ))}
@@ -256,12 +262,12 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
           <Container>
             <div className="reveal text-center mb-20">
               <div className="eyebrow mb-6" style={{ color: '#E5C989' }}>
-                {content.createEyebrow}
+                {t(c, 'atelier_page.create_eyebrow', content.createEyebrow)}
               </div>
               <h2 className="font-display text-display-md text-pearl mb-6">
-                {content.createTitleMain}{' '}
+                {t(c, 'atelier_page.create_title_main', content.createTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-light">
-                  {content.createTitleAccent}
+                  {t(c, 'atelier_page.create_title_accent', content.createTitleAccent)}
                 </em>
               </h2>
             </div>
@@ -284,17 +290,17 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
         <section className="py-32 px-12 bg-pearl-warm">
           <Container size="narrow">
             <div className="reveal text-center mb-20">
-              <div className="eyebrow mb-6">{content.faqEyebrow}</div>
+              <div className="eyebrow mb-6">{t(c, 'atelier_page.faq_eyebrow', content.faqEyebrow)}</div>
               <h2 className="font-display text-display-sm text-ink-black">
-                {content.faqTitleMain}{' '}
+                {t(c, 'atelier_page.faq_title_main', content.faqTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-dark">
-                  {content.faqTitleAccent}
+                  {t(c, 'atelier_page.faq_title_accent', content.faqTitleAccent)}
                 </em>
               </h2>
             </div>
 
             <div className="space-y-px bg-line border border-line">
-              {content.faqs.map((faq) => (
+              {faqs.map((faq) => (
                 <details key={faq.q} className="reveal bg-pearl px-8 py-6 group">
                   <summary className="cursor-pointer flex items-center justify-between gap-6 list-none">
                     <h3 className="font-display text-xl md:text-2xl text-ink-black group-open:text-gold-dark transition-colors">
@@ -320,15 +326,15 @@ export function SiteAtelierPage({ locale }: { locale: Locale }) {
         >
           <Container size="narrow">
             <div className="reveal text-center mb-12">
-              <div className="eyebrow mb-6">{content.ctaEyebrow}</div>
+              <div className="eyebrow mb-6">{t(c, 'atelier_page.cta_eyebrow', content.ctaEyebrow)}</div>
               <h2 className="font-display text-display-sm text-ink-black mb-6">
-                {content.ctaTitleMain}{' '}
+                {t(c, 'atelier_page.cta_title_main', content.ctaTitleMain)}{' '}
                 <em className="font-serif italic font-light text-gold-dark">
-                  {content.ctaTitleAccent}
+                  {t(c, 'atelier_page.cta_title_accent', content.ctaTitleAccent)}
                 </em>
               </h2>
               <p className="font-serif italic text-xl text-ink max-w-xl mx-auto">
-                {content.ctaIntro}
+                {t(c, 'atelier_page.cta_intro', content.ctaIntro)}
               </p>
             </div>
 

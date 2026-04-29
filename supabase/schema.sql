@@ -107,6 +107,20 @@ create index if not exists bookings_created_idx on public.bookings(created_at de
 create index if not exists bookings_type_idx on public.bookings(type);
 
 -- =====================================================
+-- SITE CONTENT TABLE
+-- =====================================================
+create table if not exists public.site_content (
+  key text primary key,
+  value_sq text,
+  value_en text,
+  description text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists site_content_key_idx on public.site_content(key);
+
+-- =====================================================
 -- AUTO-UPDATE updated_at TRIGGER
 -- =====================================================
 create or replace function public.set_updated_at()
@@ -129,12 +143,17 @@ drop trigger if exists bookings_updated_at on public.bookings;
 create trigger bookings_updated_at before update on public.bookings
   for each row execute function public.set_updated_at();
 
+drop trigger if exists site_content_updated_at on public.site_content;
+create trigger site_content_updated_at before update on public.site_content
+  for each row execute function public.set_updated_at();
+
 -- =====================================================
 -- ROW LEVEL SECURITY (RLS)
 -- =====================================================
 alter table public.categories enable row level security;
 alter table public.products enable row level security;
 alter table public.bookings enable row level security;
+alter table public.site_content enable row level security;
 
 -- CATEGORIES: public can read active, only authenticated can write
 drop policy if exists "Public can read active categories" on public.categories;
@@ -181,6 +200,18 @@ drop policy if exists "Authenticated can delete bookings" on public.bookings;
 create policy "Authenticated can delete bookings"
   on public.bookings for delete
   using (auth.role() = 'authenticated');
+
+-- SITE CONTENT: public can read, only authenticated can manage
+drop policy if exists "Public can read site content" on public.site_content;
+create policy "Public can read site content"
+  on public.site_content for select
+  using (true);
+
+drop policy if exists "Authenticated can manage site content" on public.site_content;
+create policy "Authenticated can manage site content"
+  on public.site_content for all
+  using (auth.role() = 'authenticated')
+  with check (auth.role() = 'authenticated');
 
 -- =====================================================
 -- STORAGE BUCKET FOR PRODUCT IMAGES

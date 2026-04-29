@@ -15,7 +15,7 @@ export default async function AdminContentPage() {
         </div>
         <h1 className="font-display text-5xl text-ink-black">Përmbajtja</h1>
         <p className="font-serif italic text-base text-ink mt-2">
-          Edito të gjitha tekstet e homepage-s. Ndryshimet shfaqen në website pas pak sekondash.
+          Edito tekstet e homepage, atelier dhe shërbimeve. Ndryshimet shfaqen menjëherë në website.
         </p>
       </div>
 

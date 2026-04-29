@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { createClient } from '@/lib/supabase/client';
 
 interface ContentEntry {
   key: string;
@@ -184,11 +183,105 @@ const SECTIONS: SectionDef[] = [
       { key: 'contact.services_list', label: 'Lista e shërbimeve (ndaj me |)', type: 'piped', hint: 'P.sh. Provim Privat|Konsultim Fejese|Riparim' },
     ],
   },
+  {
+    id: 'atelier-page',
+    title: 'Faqja /atelier',
+    icon: '◆',
+    description: 'Tekstet kryesore të faqes Atelier (procesi, llojet e krijesave, FAQ, CTA)',
+    fields: [
+      { key: 'atelier_page.hero_eyebrow', label: 'Hero — eyebrow', type: 'text' },
+      { key: 'atelier_page.hero_title_line1', label: 'Hero — titulli rreshti 1', type: 'text' },
+      { key: 'atelier_page.hero_title_accent', label: 'Hero — fjala e theksuar (italike artë)', type: 'text' },
+      { key: 'atelier_page.hero_title_line2', label: 'Hero — titulli rreshti 2', type: 'text' },
+      { key: 'atelier_page.hero_intro', label: 'Hero — paragraf hyrës', type: 'textarea' },
+      { key: 'atelier_page.hero_cta', label: 'Hero — butoni CTA', type: 'text' },
+      { key: 'atelier_page.process_eyebrow', label: 'Procesi — eyebrow', type: 'text' },
+      { key: 'atelier_page.process_title_main', label: 'Procesi — titulli pjesa kryesore', type: 'text' },
+      { key: 'atelier_page.process_title_accent', label: 'Procesi — fjala e theksuar', type: 'text' },
+      { key: 'atelier_page.process_intro', label: 'Procesi — paragraf hyrës', type: 'textarea' },
+      { key: 'atelier_page.starting_price', label: 'Cmimi fillestar (p.sh. 800 EUR)', type: 'text' },
+      { key: 'atelier_page.process_step01_title', label: 'Hapi 01 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step01_desc', label: 'Hapi 01 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step01_duration', label: 'Hapi 01 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.process_step02_title', label: 'Hapi 02 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step02_desc', label: 'Hapi 02 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step02_duration', label: 'Hapi 02 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.process_step03_title', label: 'Hapi 03 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step03_desc', label: 'Hapi 03 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step03_duration', label: 'Hapi 03 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.process_step04_title', label: 'Hapi 04 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step04_desc', label: 'Hapi 04 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step04_duration', label: 'Hapi 04 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.process_step05_title', label: 'Hapi 05 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step05_desc', label: 'Hapi 05 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step05_duration', label: 'Hapi 05 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.process_step06_title', label: 'Hapi 06 - titulli', type: 'text' },
+      { key: 'atelier_page.process_step06_desc', label: 'Hapi 06 - pershkrimi', type: 'textarea' },
+      { key: 'atelier_page.process_step06_duration', label: 'Hapi 06 - koha/cmimi', type: 'text' },
+      { key: 'atelier_page.create_eyebrow', label: 'Krijojmë — eyebrow', type: 'text' },
+      { key: 'atelier_page.create_title_main', label: 'Krijojmë — titulli pjesa kryesore', type: 'text' },
+      { key: 'atelier_page.create_title_accent', label: 'Krijojmë — fjala e theksuar', type: 'text' },
+      { key: 'atelier_page.faq_eyebrow', label: 'FAQ — eyebrow', type: 'text' },
+      { key: 'atelier_page.faq_title_main', label: 'FAQ — titulli pjesa kryesore', type: 'text' },
+      { key: 'atelier_page.faq_title_accent', label: 'FAQ — fjala e theksuar', type: 'text' },
+      { key: 'atelier_page.cta_eyebrow', label: 'CTA fund — eyebrow', type: 'text' },
+      { key: 'atelier_page.cta_title_main', label: 'CTA fund — titulli pjesa kryesore', type: 'text' },
+      { key: 'atelier_page.cta_title_accent', label: 'CTA fund — fjala e theksuar', type: 'text' },
+      { key: 'atelier_page.cta_intro', label: 'CTA fund — paragraf', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'services-page',
+    title: 'Faqja /sherbime',
+    icon: '◈',
+    description: 'Tekstet kryesore + tituj/intro për 6 shërbimet',
+    fields: [
+      { key: 'services_page.hero_eyebrow', label: 'Hero — eyebrow', type: 'text' },
+      { key: 'services_page.hero_title_main', label: 'Hero — titulli pjesa kryesore', type: 'text' },
+      { key: 'services_page.hero_title_accent', label: 'Hero — fjala e theksuar (italike)', type: 'text' },
+      { key: 'services_page.hero_intro', label: 'Hero — paragraf hyrës', type: 'textarea' },
+      { key: 'services_page.includes_label', label: 'Etiketa "Përfshin"', type: 'text' },
+      { key: 'services_page.reserve_label', label: 'Butoni "Rezervo Këtë Shërbim"', type: 'text' },
+      { key: 'services_page.contact_eyebrow', label: 'Forma e kontaktit — eyebrow', type: 'text' },
+      { key: 'services_page.contact_title_main', label: 'Forma e kontaktit — titull kryesor', type: 'text' },
+      { key: 'services_page.contact_title_accent', label: 'Forma e kontaktit — fjala e theksuar', type: 'text' },
+      { key: 'services_page.contact_intro', label: 'Forma e kontaktit — paragraf', type: 'textarea' },
+      { key: 'services_page.service01_title', label: 'Shërbimi 01 — titulli', type: 'text' },
+      { key: 'services_page.service01_intro', label: 'Shërbimi 01 — intro', type: 'textarea' },
+      { key: 'services_page.service01_description', label: 'Sherbimi 01 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service01_duration', label: 'Sherbimi 01 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service01_includes', label: 'Sherbimi 01 - perfshin (ndaj me |)', type: 'piped' },
+      { key: 'services_page.service02_title', label: 'Shërbimi 02 — titulli', type: 'text' },
+      { key: 'services_page.service02_intro', label: 'Shërbimi 02 — intro', type: 'textarea' },
+      { key: 'services_page.service02_description', label: 'Sherbimi 02 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service02_duration', label: 'Sherbimi 02 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service02_includes', label: 'Sherbimi 02 - perfshin (ndaj me |)', type: 'piped' },
+      { key: 'services_page.service03_title', label: 'Shërbimi 03 — titulli', type: 'text' },
+      { key: 'services_page.service03_intro', label: 'Shërbimi 03 — intro', type: 'textarea' },
+      { key: 'services_page.service03_description', label: 'Sherbimi 03 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service03_duration', label: 'Sherbimi 03 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service03_includes', label: 'Sherbimi 03 - perfshin (ndaj me |)', type: 'piped' },
+      { key: 'services_page.service04_title', label: 'Shërbimi 04 — titulli', type: 'text' },
+      { key: 'services_page.service04_intro', label: 'Shërbimi 04 — intro', type: 'textarea' },
+      { key: 'services_page.service04_description', label: 'Sherbimi 04 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service04_duration', label: 'Sherbimi 04 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service04_includes', label: 'Sherbimi 04 - perfshin (ndaj me |)', type: 'piped' },
+      { key: 'services_page.service05_title', label: 'Shërbimi 05 — titulli', type: 'text' },
+      { key: 'services_page.service05_intro', label: 'Shërbimi 05 — intro', type: 'textarea' },
+      { key: 'services_page.service05_description', label: 'Sherbimi 05 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service05_duration', label: 'Sherbimi 05 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service05_includes', label: 'Sherbimi 05 - perfshin (ndaj me |)', type: 'piped' },
+      { key: 'services_page.service06_title', label: 'Shërbimi 06 — titulli', type: 'text' },
+      { key: 'services_page.service06_intro', label: 'Shërbimi 06 — intro', type: 'textarea' },
+      { key: 'services_page.service06_description', label: 'Sherbimi 06 - pershkrimi kryesor', type: 'textarea' },
+      { key: 'services_page.service06_duration', label: 'Sherbimi 06 - koha/cmimi', type: 'text' },
+      { key: 'services_page.service06_includes', label: 'Sherbimi 06 - perfshin (ndaj me |)', type: 'piped' },
+    ],
+  },
 ];
 
 export function ContentManager({ initialContent }: { initialContent: ContentEntry[] }) {
   const router = useRouter();
-  const supabase = createClient();
   const [openSection, setOpenSection] = useState<string | null>('hero');
   const [savingKey, setSavingKey] = useState<string | null>(null);
 
@@ -212,28 +305,17 @@ export function ContentManager({ initialContent }: { initialContent: ContentEntr
       return;
     }
 
-    const existing = contentMap.get(key);
-    let error;
-
-    if (existing) {
-      // Update
-      const result = await supabase
-        .from('site_content')
-        .update({ value_sq: entry.sq, value_en: entry.en })
-        .eq('key', key);
-      error = result.error;
-    } else {
-      // Insert
-      const result = await supabase
-        .from('site_content')
-        .insert({ key, value_sq: entry.sq, value_en: entry.en });
-      error = result.error;
-    }
+    const response = await fetch('/api/admin/content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value_sq: entry.sq, value_en: entry.en }),
+    });
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
 
     setSavingKey(null);
 
-    if (error) {
-      toast.error('Gabim: ' + error.message);
+    if (!response.ok) {
+      toast.error('Gabim: ' + (payload?.error ?? 'Nuk u ruajt'));
       return;
     }
 

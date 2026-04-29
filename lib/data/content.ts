@@ -33,7 +33,7 @@ export async function getSiteContentMap(locale: Locale = 'sq'): Promise<Map<stri
   const map = new Map<string, string>();
   for (const e of entries) {
     const v = locale === 'sq' ? e.value_sq : e.value_en;
-    if (v != null) map.set(e.key, v);
+    if (v != null && v.trim() !== '') map.set(e.key, v);
   }
   return map;
 }
