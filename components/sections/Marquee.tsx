@@ -16,18 +16,19 @@ export async function Marquee({ locale = 'sq' }: { locale?: Locale }) {
   return (
     <div className="bg-ink-black text-pearl-warm py-7 overflow-hidden border-y border-gold/20">
       {/*
-        IMPORTANT: do NOT use `gap-*` on the marquee track. CSS gap is applied
-        only between siblings, not after the last item. With `from: 0` →
-        `to: -50%` keyframes that produces a misalignment of one gap when the
-        loop hits the duplicate half — visible as a "reset" jump on mobile
-        where the animation is fast. Instead, give every item a fixed right
-        spacer so each half has identical total width.
+        Marquee track must size to its intrinsic content width (w-max), not
+        stretch to the viewport — otherwise translateX(-50%) is 50% of the
+        VIEWPORT instead of 50% of the duplicated content, producing a
+        visible reset jump on mobile every few seconds.
+
+        Each item carries its own right-padding instead of using parent gap,
+        so both halves have pixel-identical width and the loop is seamless.
       */}
-      <div className="flex animate-marquee marquee-mobile-fast whitespace-nowrap">
+      <div className="flex w-max animate-marquee marquee-mobile-fast">
         {doubled.map((item, i) => (
           <span
             key={i}
-            className="font-display text-2xl tracking-widest flex items-center shrink-0 pr-20"
+            className="font-display text-2xl tracking-widest flex items-center shrink-0 pr-20 whitespace-nowrap"
           >
             {item}
             <span className="ml-20 text-gold text-sm">✦</span>
