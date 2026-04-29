@@ -1,19 +1,22 @@
 'use client';
 
-import type { Category, Locale } from '@/lib/types';
+import type { Category, Locale, ProductAudience } from '@/lib/types';
 
 export type SortOption = 'newest' | 'oldest' | 'name_asc' | 'name_desc';
+export type AudienceFilterOption = ProductAudience | 'all';
 
 interface ProductFiltersProps {
   categories: Category[];
   selectedCategory: string | null;
   onCategoryChange: (slug: string | null) => void;
+  selectedAudience: AudienceFilterOption;
+  onAudienceChange: (audience: AudienceFilterOption) => void;
   inStockOnly: boolean;
-  onInStockChange: (v: boolean) => void;
+  onInStockChange: (value: boolean) => void;
   featuredOnly: boolean;
-  onFeaturedChange: (v: boolean) => void;
+  onFeaturedChange: (value: boolean) => void;
   sortBy: SortOption;
-  onSortChange: (s: SortOption) => void;
+  onSortChange: (sort: SortOption) => void;
   totalCount: number;
   filteredCount: number;
   locale?: Locale;
@@ -23,6 +26,8 @@ export function ProductFilters({
   categories,
   selectedCategory,
   onCategoryChange,
+  selectedAudience,
+  onAudienceChange,
   inStockOnly,
   onInStockChange,
   featuredOnly,
@@ -38,6 +43,13 @@ export function ProductFilters({
       filters: 'Filtra',
       categories: 'Kategoritë',
       all: 'Të gjitha',
+      audience: 'Ndarja',
+      audienceOptions: {
+        all: 'Të gjitha',
+        women: 'Femra',
+        men: 'Meshkuj',
+        unisex: 'Unisex',
+      },
       availability: 'Disponueshmëria',
       inStock: 'Vetëm në stok',
       featured: 'Vetëm featured',
@@ -45,8 +57,8 @@ export function ProductFilters({
       sortOptions: {
         newest: 'Më të rejat',
         oldest: 'Më të vjetrat',
-        name_asc: 'Emri A → Z',
-        name_desc: 'Emri Z → A',
+        name_asc: 'Emri A -> Z',
+        name_desc: 'Emri Z -> A',
       },
       showing: 'Duke shfaqur',
       of: 'nga',
@@ -57,6 +69,13 @@ export function ProductFilters({
       filters: 'Filters',
       categories: 'Categories',
       all: 'All',
+      audience: 'Audience',
+      audienceOptions: {
+        all: 'All',
+        women: 'Women',
+        men: 'Men',
+        unisex: 'Unisex',
+      },
       availability: 'Availability',
       inStock: 'In stock only',
       featured: 'Featured only',
@@ -64,8 +83,8 @@ export function ProductFilters({
       sortOptions: {
         newest: 'Newest',
         oldest: 'Oldest',
-        name_asc: 'Name A → Z',
-        name_desc: 'Name Z → A',
+        name_asc: 'Name A -> Z',
+        name_desc: 'Name Z -> A',
       },
       showing: 'Showing',
       of: 'of',
@@ -74,7 +93,8 @@ export function ProductFilters({
     },
   }[locale];
 
-  const hasActiveFilters = selectedCategory !== null || inStockOnly || featuredOnly;
+  const hasActiveFilters =
+    selectedCategory !== null || selectedAudience !== 'all' || inStockOnly || featuredOnly;
 
   return (
     <aside className="lg:sticky lg:top-32 lg:self-start">
@@ -85,6 +105,7 @@ export function ProductFilters({
             <button
               onClick={() => {
                 onCategoryChange(null);
+                onAudienceChange('all');
                 onInStockChange(false);
                 onFeaturedChange(false);
               }}
@@ -95,7 +116,6 @@ export function ProductFilters({
           )}
         </div>
 
-        {/* Categories */}
         <div className="mb-8">
           <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-4 font-medium">
             {t.categories}
@@ -130,7 +150,29 @@ export function ProductFilters({
           </ul>
         </div>
 
-        {/* Availability */}
+        <div className="mb-8 pb-8 border-b border-line">
+          <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-4 font-medium">
+            {t.audience}
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {(Object.entries(t.audienceOptions) as Array<[AudienceFilterOption, string]>).map(
+              ([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => onAudienceChange(value)}
+                  className={`border px-3 py-2 text-[10px] uppercase tracking-widest transition-colors ${
+                    selectedAudience === value
+                      ? 'border-gold bg-ink-black text-gold-light'
+                      : 'border-line text-ink hover:border-gold hover:text-gold-dark'
+                  }`}
+                >
+                  {label}
+                </button>
+              )
+            )}
+          </div>
+        </div>
+
         <div className="mb-8 pb-8 border-b border-line">
           <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-4 font-medium">
             {t.availability}
@@ -139,7 +181,7 @@ export function ProductFilters({
             <input
               type="checkbox"
               checked={inStockOnly}
-              onChange={(e) => onInStockChange(e.target.checked)}
+              onChange={(event) => onInStockChange(event.target.checked)}
               className="w-4 h-4 accent-gold-dark"
             />
             <span className="font-serif text-base text-ink group-hover:text-gold-dark transition-colors">
@@ -150,7 +192,7 @@ export function ProductFilters({
             <input
               type="checkbox"
               checked={featuredOnly}
-              onChange={(e) => onFeaturedChange(e.target.checked)}
+              onChange={(event) => onFeaturedChange(event.target.checked)}
               className="w-4 h-4 accent-gold-dark"
             />
             <span className="font-serif text-base text-ink group-hover:text-gold-dark transition-colors">
@@ -159,19 +201,18 @@ export function ProductFilters({
           </label>
         </div>
 
-        {/* Sort */}
         <div>
           <div className="text-[10px] tracking-widest uppercase text-gold-dark mb-4 font-medium">
             {t.sort}
           </div>
           <select
             value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as SortOption)}
+            onChange={(event) => onSortChange(event.target.value as SortOption)}
             className="w-full py-3 px-0 border-0 border-b border-line bg-transparent font-serif text-base text-ink-black outline-none focus:border-gold cursor-pointer"
           >
-            {Object.entries(t.sortOptions).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
+            {Object.entries(t.sortOptions).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
               </option>
             ))}
           </select>

@@ -2,7 +2,11 @@
 
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { ProductCard } from '@/components/ui/ProductCard';
-import { ProductFilters, type SortOption } from '@/components/ui/ProductFilters';
+import {
+  ProductFilters,
+  type AudienceFilterOption,
+  type SortOption,
+} from '@/components/ui/ProductFilters';
 import type { Product, Category, Locale } from '@/lib/types';
 
 interface CatalogClientProps {
@@ -19,6 +23,7 @@ export function CatalogClient({
   locale = 'sq',
 }: CatalogClientProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory);
+  const [selectedAudience, setSelectedAudience] = useState<AudienceFilterOption>('all');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -34,7 +39,7 @@ export function CatalogClient({
         el.classList.add('visible');
       }
     });
-  }, [selectedCategory, inStockOnly, featuredOnly, sortBy, deferredSearchQuery]);
+  }, [selectedCategory, selectedAudience, inStockOnly, featuredOnly, sortBy, deferredSearchQuery]);
 
   const categoryMap = useMemo(() => {
     const m = new Map<string, Category>();
@@ -48,6 +53,10 @@ export function CatalogClient({
     if (selectedCategory) {
       const cat = categories.find((c) => c.slug === selectedCategory);
       if (cat) list = list.filter((p) => p.category_id === cat.id);
+    }
+
+    if (selectedAudience !== 'all') {
+      list = list.filter((p) => p.audience === selectedAudience);
     }
 
     if (inStockOnly) {
@@ -96,6 +105,7 @@ export function CatalogClient({
     products,
     categories,
     selectedCategory,
+    selectedAudience,
     inStockOnly,
     featuredOnly,
     sortBy,
@@ -122,6 +132,8 @@ export function CatalogClient({
         categories={categories}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
+        selectedAudience={selectedAudience}
+        onAudienceChange={setSelectedAudience}
         inStockOnly={inStockOnly}
         onInStockChange={setInStockOnly}
         featuredOnly={featuredOnly}

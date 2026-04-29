@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
-import type { Product, Category } from '@/lib/types';
+import type { Product, Category, ProductAudience } from '@/lib/types';
 
 interface Props {
   products: (Product & { category?: Category })[];
@@ -18,8 +18,15 @@ export function ProductsTable({ products, categories }: Props) {
   const supabase = createClient();
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterAudience, setFilterAudience] = useState<ProductAudience | 'all'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const audienceLabels: Record<ProductAudience, string> = {
+    women: 'Femra',
+    men: 'Meshkuj',
+    unisex: 'Unisex',
+  };
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
@@ -27,11 +34,12 @@ export function ProductsTable({ products, categories }: Props) {
         return false;
       }
       if (filterCategory !== 'all' && p.category_id !== filterCategory) return false;
+      if (filterAudience !== 'all' && p.audience !== filterAudience) return false;
       if (filterStatus === 'active' && !p.is_active) return false;
       if (filterStatus === 'inactive' && p.is_active) return false;
       return true;
     });
-  }, [products, search, filterCategory, filterStatus]);
+  }, [products, search, filterCategory, filterAudience, filterStatus]);
 
   const handleDelete = async (id: string, name: string) => {
     if (!confirm(`A je i sigurt që do të fshish "${name}"? Kjo nuk mund të rikthehet.`)) {
@@ -91,7 +99,7 @@ export function ProductsTable({ products, categories }: Props) {
   return (
     <div>
       {/* Filters */}
-      <div className="bg-white border border-line p-6 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white border border-line p-6 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label className="block text-[10px] tracking-widest uppercase text-gold-dark mb-2 font-medium">
             Kërko
@@ -133,6 +141,21 @@ export function ProductsTable({ products, categories }: Props) {
             <option value="all">Të gjitha</option>
             <option value="active">Aktive</option>
             <option value="inactive">Joaktive</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] tracking-widest uppercase text-gold-dark mb-2 font-medium">
+            Ndarja
+          </label>
+          <select
+            value={filterAudience}
+            onChange={(e) => setFilterAudience(e.target.value as ProductAudience | 'all')}
+            className="w-full py-2 px-0 border-0 border-b border-line bg-transparent font-serif text-base text-ink-black outline-none focus:border-gold transition-colors cursor-pointer"
+          >
+            <option value="all">Te gjitha</option>
+            <option value="women">Femra</option>
+            <option value="men">Meshkuj</option>
+            <option value="unisex">Unisex</option>
           </select>
         </div>
       </div>
@@ -186,6 +209,9 @@ export function ProductsTable({ products, categories }: Props) {
                 <div className="flex gap-3 mt-1 flex-wrap">
                   <span className="text-[10px] tracking-widest uppercase text-gold-dark">
                     {product.category?.name_sq ?? '—'}
+                  </span>
+                  <span className="text-[10px] tracking-widest uppercase text-ink/50">
+                    {audienceLabels[product.audience ?? 'unisex']}
                   </span>
                   {product.is_featured && (
                     <span className="text-[10px] tracking-widest uppercase text-gold-dark">

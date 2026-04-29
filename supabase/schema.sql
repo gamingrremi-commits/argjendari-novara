@@ -46,6 +46,7 @@ create table if not exists public.products (
   badge_en text,
   images text[] default array[]::text[],
   model_url text,
+  audience text default 'unisex' check (audience in ('women', 'men', 'unisex')),
   display_order int default 0,
   is_active boolean default true,
   created_at timestamptz default now(),
@@ -55,10 +56,19 @@ create table if not exists public.products (
 alter table public.products
   add column if not exists model_url text;
 
+alter table public.products
+  add column if not exists audience text default 'unisex'
+  check (audience in ('women', 'men', 'unisex'));
+
+update public.products
+set audience = 'unisex'
+where audience is null;
+
 create index if not exists products_slug_idx on public.products(slug);
 create index if not exists products_category_idx on public.products(category_id);
 create index if not exists products_active_idx on public.products(is_active);
 create index if not exists products_featured_idx on public.products(is_featured);
+create index if not exists products_audience_idx on public.products(audience);
 
 -- =====================================================
 -- BOOKINGS / INQUIRIES TABLE

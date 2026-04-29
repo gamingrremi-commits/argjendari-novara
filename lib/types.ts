@@ -4,6 +4,7 @@
  */
 
 export type Locale = 'sq' | 'en';
+export type ProductAudience = 'women' | 'men' | 'unisex';
 
 export interface Category {
   id: string;
@@ -40,6 +41,7 @@ export interface Product {
   badge_en: string | null;
   images: string[];
   model_url: string | null;
+  audience: ProductAudience;
   display_order: number;
   is_active: boolean;
   created_at: string;

@@ -68,6 +68,7 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
     price_lek: product?.price_lek?.toString() ?? '',
     show_price: product?.show_price ?? false,
     model_url: product?.model_url ?? '',
+    audience: product?.audience ?? 'unisex',
     badge_sq: product?.badge_sq ?? '',
     badge_en: product?.badge_en ?? '',
     in_stock: product?.in_stock ?? true,
@@ -270,6 +271,28 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
                 Url-ja do të jetë: /produkt/{form.slug || '...'}
               </p>
             </Field>
+          </Card>
+
+          <Card title="Ndarja">
+            <Field label="Produkti është për">
+              <select
+                value={form.audience}
+                onChange={(event) =>
+                  setForm({
+                    ...form,
+                    audience: event.target.value as 'women' | 'men' | 'unisex',
+                  })
+                }
+                className="input cursor-pointer"
+              >
+                <option value="women">Femra</option>
+                <option value="men">Meshkuj</option>
+                <option value="unisex">Unisex</option>
+              </select>
+            </Field>
+            <p className="text-sm font-serif italic text-ink/60">
+              Kjo kontrollon filtrin publik dhe ndarjen e produkteve ne katalog.
+            </p>
           </Card>
 
           <Card title="Përshkrim">
